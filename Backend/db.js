@@ -18,6 +18,27 @@ const ProfessorSchema = mongoose.Schema({
         type: String,
         required: true, 
     }, 
+    category : {
+        type: String,
+        required     : true,     
+        enum : ["Professor" , "Academic Advisor" , "Consultant"]
+    }, 
+    password : {
+        type: String,
+        required: true, 
+    } 
+})
+
+const adminSchema = mongoose.Schema({
+
+    name : {
+        type: String,
+        required: true, 
+    }, 
+    email : {
+        type: String,
+        required: true, 
+    }, 
     password : {
         type: String,
         required: true, 
@@ -39,6 +60,13 @@ const ProfessorDetailSchema = mongoose.Schema ({
         type: String,
         ref : 'Professor',  
         required: true,     
+    }, 
+
+    category : {
+        type: String,
+        ref : 'Professor',  
+        required: true,
+
     }, 
 
     profile_photo : {
@@ -68,9 +96,16 @@ const ProfessorDetailSchema = mongoose.Schema ({
         enum : ['Verified', 'Not-Verified'],                
 
     }
-
-
-
 })
 
-module.exports = mongoose;   
+
+const Professor = mongoose.model('Professor', ProfessorSchema);  
+const Admin = mongoose.model('Admin', adminSchema); 
+const ProfessorDetail = mongoose.model('ProfessorDetail', ProfessorDetailSchema);   
+
+
+module.exports = {
+    Professor,
+    Admin,
+    ProfessorDetail  
+};   
