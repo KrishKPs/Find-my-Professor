@@ -9,6 +9,10 @@ const professorDetails = require('../Functions/professordetails');
 const detailsupdate = require('../Functions/professordetailupdate');
 const adminverification = require('../Functions/adminverification');
 const changeverification = require('../Functions/changeverification');
+const userlogin = require('../Functions/userlogin');
+const usersignup = require('../Functions/usersignup');
+const seeallprofessor = require('../Functions/seeallprofessor');
+const schoolviseprofessor = require('../Functions/schoolviseprofessor');
 
 const router = express.Router(); 
 
@@ -25,6 +29,12 @@ router.post('/professorlogin' , professorlogin);
 router.post('/enterdetails' , authenticate , professorDetails)
 router.put('/updatedetails' , authenticate , detailsupdate )
 
+router.post('/usersignup' , usersignup)
+router.post('/userlogin' , userlogin)
+router.get('/schoolprofessor/:schoolname' , authenticate , schoolviseprofessor)
+
+
+router.get('/seeallprofessor' , authenticate  , seeallprofessor)
 
 
 module.exports  = router;     

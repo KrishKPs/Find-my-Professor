@@ -32,7 +32,8 @@ async function professorSignup (req,res){
     await Professor.create ({
 
         name : person.name,  
-        email : person.email,  
+        email : person.email, 
+        college_name : person.college_name,   
         category : person.category,  
         password : hashed,  
     })

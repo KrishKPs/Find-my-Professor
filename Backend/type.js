@@ -8,10 +8,18 @@ const adminSchema = zod.object({
 
 })
 
+const UserSchema = zod.object({
+    name : zod.string().min(1, 'Name is required'),  
+    email : zod.string().email('Invalid email format'), 
+    college_name : zod.string().min(1, 'College name is required'), 
+    password : zod.string().min(6, 'Password must be at least 6 characters long'),           
+})
+
 const professorSchema = zod.object({ 
     
         name : zod.string().min(1, 'Name is required'),  
         email : zod.string().email('Invalid email format'), 
+        college_name : zod.string().min(1, 'College name is required'),  
         category : zod.string().min(1, 'Category is required'), 
         password : zod.string().min(6, 'Password must be at least 6 characters long'),
   }) 
@@ -36,5 +44,6 @@ const professorDetailSchema = zod.object({
 module.exports = { 
     adminSchema, 
     professorSchema, 
-    professorDetailSchema 
+    professorDetailSchema , 
+    UserSchema 
 }; 

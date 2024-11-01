@@ -7,7 +7,26 @@ mongoose.connect(process.env.MONGO_URL)
 .catch (err => console.log(err));   
  
 
+const UserSchema = mongoose.Schema({
 
+    name : {
+        type: String,
+        required: true,
+    }, 
+    email : {
+        type: String,
+        required: true,
+    },
+    college_name : {
+        type: String,
+        required: true,
+    }, 
+    password : {
+        type: String,
+        required: true,
+    } 
+
+})
 const ProfessorSchema = mongoose.Schema({
 
     name : {
@@ -17,6 +36,11 @@ const ProfessorSchema = mongoose.Schema({
     email : {
         type: String,
         required: true, 
+    }, 
+    college_name : {
+        type: String,
+        required: true, 
+
     }, 
     category : {
         type: String,
@@ -62,6 +86,13 @@ const ProfessorDetailSchema = mongoose.Schema ({
         required: true,     
     }, 
 
+    college_name : {
+        type: String,
+        ref : 'Professor',
+        required: true,
+
+    }, 
+
     category : {
         type: String,
         ref : 'Professor',  
@@ -101,11 +132,13 @@ const ProfessorDetailSchema = mongoose.Schema ({
 
 const Professor = mongoose.model('Professor', ProfessorSchema);  
 const Admin = mongoose.model('Admin', adminSchema); 
-const ProfessorDetail = mongoose.model('ProfessorDetail', ProfessorDetailSchema);   
+const ProfessorDetail = mongoose.model('ProfessorDetail', ProfessorDetailSchema);  
+const User = mongoose.model('User', UserSchema);      
 
 
 module.exports = {
     Professor,
     Admin,
-    ProfessorDetail  
+    ProfessorDetail  , 
+    User 
 };   
