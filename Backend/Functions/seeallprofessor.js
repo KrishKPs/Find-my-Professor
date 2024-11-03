@@ -1,10 +1,10 @@
-const { Professor } = require("../db");
+const {  ProfessorDetail } = require("../db");
 
 
 async function seeallprofessor (req,res) {
 
 
-    const Professors = await Professor.find ({}); 
+    const Professors = await ProfessorDetail.find ({ verification : "Verified" });      
 
     if (!Professors) {
         return res.status(401).json({

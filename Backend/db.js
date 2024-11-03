@@ -71,63 +71,67 @@ const adminSchema = mongoose.Schema({
 
 
 
-const ProfessorDetailSchema = mongoose.Schema ({
-
-    name : {
-
+const ProfessorDetailSchema = mongoose.Schema({
+    name: {
         type: String,
-        ref : 'Professor',    
-        required: true,  
-    }, 
-
-    email : {
-        type: String,
-        ref : 'Professor',  
-        required: true,     
-    }, 
-
-    college_name : {
-        type: String,
-        ref : 'Professor',
+        ref: 'Professor',
         required: true,
-
-    }, 
-
-    category : {
-        type: String,
-        ref : 'Professor',  
-        required: true,
-
-    }, 
-
-    profile_photo : {
-        type: String,
-        required: true,         
     },
-    major : {
+    email: {
         type: String,
-        required: true,         
-    },  
-    location : {
+        ref: 'Professor',
+        required: true,
+    },
+    college_name: {
         type: String,
-        required: true,         
-    }, 
-    office_hours : {
+        ref: 'Professor',
+        required: true,
+    },
+    category: {
         type: String,
-        required: true,         
-    },   
-    available : {
+        ref: 'Professor',
+        required: true,
+    },
+    profile_photo: {
         type: String,
-        required: true, 
-        enum : ['Available', 'Not-Available'],            
-    },   
-    verification : {
+        required: true,
+    },
+    major: {
         type: String,
-        required: true, 
-        enum : ['Verified', 'Not-Verified'],                
-
+        required: true,
+    },
+    location: {
+        type: String,
+        required: true,
+    },
+    office_hours: [
+        {
+            day: {
+                type: String,
+                required: true,
+                enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+            },
+            startTime: {
+                type: String,
+                required: true,  
+            },
+            endTime: {
+                type: String,
+                required: true, 
+            }
+        }
+    ],
+    available: {
+        type: String,
+        required: true,
+        enum: ['Available', 'Not-Available'],
+    },
+    verification: {
+        type: String,
+        required: true,
+        enum: ['Verified', 'Not-Verified'],
     }
-})
+});
 
 
 const Professor = mongoose.model('Professor', ProfessorSchema);  

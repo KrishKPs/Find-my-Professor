@@ -36,6 +36,7 @@ async function professorDetails(req, res) {
             name: professorfind.name,
             email: professorfind.email,
             category: professorfind.category,
+            college_name : professorfind.college_name,   
             profile_photo: person.profile_photo,
             major: person.major,
             location: person.location,
