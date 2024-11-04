@@ -12,7 +12,7 @@ async function authenticate (req, res , next) {
 
     if (!token ) {
 
-        res.json ({
+       return res.json ({
             message: 'Unauthorized access'   
         })
     }
