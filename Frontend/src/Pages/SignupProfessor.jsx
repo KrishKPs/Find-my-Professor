@@ -3,13 +3,14 @@ import { Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import axios from 'axios'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function ProfessorSignup() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    collegeName: '',
+     college_name: '',
     category: '',
     password: '',
   })
@@ -36,7 +37,7 @@ export default function ProfessorSignup() {
       case 'email':
         error = /\S+@\S+\.\S+/.test(value) ? '' : 'Invalid email format'
         break
-      case 'collegeName':
+      case 'college_name':
         error = value.trim() ? '' : 'College name is required'
         break
       case 'category':
@@ -51,12 +52,27 @@ export default function ProfessorSignup() {
     setErrors(prev => ({ ...prev, [name]: error }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const formErrors = Object.values(errors).filter(error => error !== '')
     if (formErrors.length === 0) {
       console.log('Form submitted:', formData)
-      // Here you would typically send the data to your backend
+     
+      try {
+        const response = await axios.post('http://localhost:3087/professorsignup', formData)  
+        console.log(response.data)  
+        alert('Registration successful')  
+
+
+        
+      } catch (error) {
+        
+        alert (error) 
+        
+      }
+     
+      
+
     } else {
       console.log('Form has errors, please correct them')
     }
@@ -103,18 +119,18 @@ export default function ProfessorSignup() {
               {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
             </div>
             <div>
-              <Label htmlFor="collegeName">College Name</Label>
+              <Label htmlFor="college_name">College Name</Label>
               <Input
-                id="collegeName"
-                name="collegeName"
+                id="college_name"
+                name="college_name"
                 type="text"
                 required
                 placeholder="University of Example"
-                value={formData.collegeName}
+                value={formData.college_name}
                 onChange={handleChange}
-                className={errors.collegeName ? 'border-red-500' : ''}
+                className={errors.college_name ? 'border-red-500' : ''}
               />
-              {errors.collegeName && <p className="mt-1 text-xs text-red-500">{errors.collegeName}</p>}
+              {errors.college_name && <p className="mt-1 text-xs text-red-500">{errors.college_name}</p>}
             </div>
             <div>
               <Label htmlFor="category">Category</Label>
@@ -123,9 +139,9 @@ export default function ProfessorSignup() {
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="professor">Professor</SelectItem>
-                  <SelectItem value="advisor">Academic Advisor</SelectItem>
-                  <SelectItem value="consultant">Consultant</SelectItem>
+                  <SelectItem value="Professor">Professor</SelectItem>
+                  <SelectItem value="Academic Adviso">Academic Advisor</SelectItem>
+                  <SelectItem value="Consultant">Consultant</SelectItem>
                 </SelectContent>
               </Select>
               {errors.category && <p className="mt-1 text-xs text-red-500">{errors.category}</p>}
@@ -157,7 +173,7 @@ export default function ProfessorSignup() {
           </div>
 
           <div>
-            <Button type="submit" className="w-full" disabled={!isFormValid()}>
+            <Button type="submit" className="w-full" >
               Sign Up
             </Button>
           </div>
