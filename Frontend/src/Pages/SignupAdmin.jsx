@@ -48,7 +48,7 @@ export default function AdminSignup() {
       console.log('Form submitted:', formData)
      
       try {
-        const response = await axios.post('http://localhost:3087/professorsignup', formData)  
+        const response = await axios.post('http://localhost:3087/adminsignup', formData)  
         console.log(response.data)  
         alert('Registration successful')  
 
