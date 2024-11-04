@@ -1,21 +1,20 @@
 import './App.css'
-
-import AdminSignup from './Pages/SignupAdmin'
 import ProfessorSignup from './Pages/SignupProfessor'
-import LoginUI from './Pages/LoginProfessor'
-import { BrowserRouter, Routes } from 'react-router-dom'
-import { Route } from 'lucide-react'
+import LoginUI from './Pages/Login'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import AcademicFinder from './Pages/Finder'
 
 function App() {
 
 
   return (
     <>
-     <AdminSignup/> 
+    
      <BrowserRouter>
      <Routes>
       <Route path='/login' element={<LoginUI/>}/>
       <Route path='/signup' element={<ProfessorSignup/>}/>
+      <Route path='dashboard' element ={<AcademicFinder/>}/>  
      </Routes>
      </BrowserRouter>
     </>
