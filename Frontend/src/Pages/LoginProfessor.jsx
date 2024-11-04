@@ -5,28 +5,21 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import axios from 'axios'  
 
 export default function LoginUI() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    captcha: '',
+   
   })
   const [errors, setErrors] = useState({})
   const [showPassword, setShowPassword] = useState(false)
-  const [captchaQuestion, setCaptchaQuestion] = useState('')
-  const [captchaAnswer, setCaptchaAnswer] = useState('')
 
-  useEffect(() => {
-    generateCaptcha()
-  }, [])
 
-  const generateCaptcha = () => {
-    const num1 = Math.floor(Math.random() * 10)
-    const num2 = Math.floor(Math.random() * 10)
-    setCaptchaQuestion(`What is ${num1} + ${num2}?`)
-    setCaptchaAnswer((num1 + num2).toString())
-  }
+
+
+ 
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -43,24 +36,43 @@ export default function LoginUI() {
       case 'password':
         error = value.length >= 6 ? '' : 'Password must be at least 6 characters long'
         break
-      case 'captcha':
-        error = value === captchaAnswer ? '' : 'Incorrect CAPTCHA answer'
-        break
+     
       default:
         break
     }
     setErrors(prev => ({ ...prev, [name]: error }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const formErrors = Object.values(errors).filter(error => error !== '')
-    if (formErrors.length === 0 && formData.captcha === captchaAnswer) {
-      console.log('Form submitted:', formData)
-      // Here you would typically send the data to your backend
-    } else {
-      console.log('Form has errors, please correct them')
-    }
+
+  
+   
+   
+
+
+      try {
+
+        const response = await axios.post('http://localhost:3087/professorlogin', formData) 
+        console.log(response.data) 
+
+        alert ('Login successful')  
+        console.log('Form submitted:', formData) 
+        
+      } catch (error) {
+
+        if (error.response) {
+          console.log(error.response.data)
+          alert(error.response.data.message)   
+        } 
+        
+      }
+
+      
+    
+
+
+    
   }
 
   const isFormValid = () => {
@@ -120,7 +132,7 @@ export default function LoginUI() {
               </div>
               {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" onClick={handleSubmit}>
               Log in
             </Button>
           </form>
