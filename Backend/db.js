@@ -37,6 +37,11 @@ const ProfessorSchema = mongoose.Schema({
         type: String,
         required: true, 
     }, 
+    phone_number : {
+        type: String,
+        required: true, 
+
+    }, 
     college_name : {
         type: String,
         required: true, 
@@ -92,6 +97,12 @@ const ProfessorDetailSchema = mongoose.Schema({
         ref: 'Professor',
         required: true,
     },
+    phone_number : {
+        type: String,
+        ref: 'Professor',
+        required: true,
+    }, 
+    
     profile_photo: {
         type: String,
         required: true,

@@ -6,6 +6,8 @@ import axios from 'axios' ;
 export default function AcademicFinder() {
 
   const [mockProfiles, setMockProfiles] = useState([ ]) ; 
+  const [email , setEmail] = useState('') ;  
+
 
 
 
@@ -16,6 +18,8 @@ const getProfessors = async () => {
   .then (response => {
     console.log(response.data.Professors) ;  
     setMockProfiles (response.data.Professors) ;  
+    setEmail ( response.data.Professors.email) ; 
+    console.log (response.data.Professors.email) 
   })
  .catch (error => { 
     console.log(error) ; 
@@ -25,8 +29,11 @@ const getProfessors = async () => {
 }
 
 
+
+
 useEffect (()=>{
-  getProfessors() ;    
+  getProfessors() ;  
+     
 }, [ 
 ])
 
@@ -126,7 +133,7 @@ useEffect (()=>{
             >
               <X className="h-6 w-6" />
             </button>
-            <img src={selectedProfile.image} alt="https://st3.depositphotos.com/15648834/17930/v/450/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
+            <img src="https://st3.depositphotos.com/15648834/17930/v/450/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" alt="https://st3.depositphotos.com/15648834/17930/v/450/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg" />
             <h2 className="text-2xl font-semibold text-center text-gray-800 mb-2">{selectedProfile.name}</h2>
             <p className="text-gray-600 text-center mb-1">{selectedProfile.title}</p>
             <p className="text-gray-500 text-sm text-center mb-4">{selectedProfile.college}</p>
@@ -146,8 +153,8 @@ useEffect (()=>{
               </div>
               <div>
                 <h3 className="text-lg font-medium text-gray-700 mb-2">Contact</h3>
-                <p className="text-gray-600">email@example.com</p>
-                <p className="text-gray-600">(123) 456-7890</p>
+                <p className="text-gray-600">{selectedProfile.email}</p>
+                <p className="text-gray-600">{selectedProfile.phone_number || "No  phone number available"}</p>
               </div>
             </div>
             <button className="mt-8 w-full bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600 transition-colors">
