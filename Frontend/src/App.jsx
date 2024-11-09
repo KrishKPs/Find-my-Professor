@@ -16,9 +16,11 @@ function App() {
      <Routes>
       <Route path='/login' element={<LoginUI/>}/>
       <Route path='/signup' element={<ProfessorSignup/>}/>
-      <Route path='dashboard' element ={<AcademicFinder/>}/>
-      <Route path='homepage' element ={<Homepage/>}/>
-      <Route path='/' element ={<ProfessorDetail/>}/>   
+      <Route path='/dashboard' element ={<AcademicFinder/>}/>
+      <Route path='/homepage' element ={<Homepage/>}/>
+      <Route path='/' element ={<ProfessorDetail/>}/>  
+
+      
      </Routes>
      </BrowserRouter>
     </>

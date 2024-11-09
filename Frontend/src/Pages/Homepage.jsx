@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { AiOutlineSearch } from "react-icons/ai";
 import { X } from 'lucide-react'; // Close icon for profile sidebar
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function Homepage() {
     const [professors, setProfessors] = useState([]);
@@ -10,6 +11,8 @@ export default function Homepage() {
     const [selectedProfile, setSelectedProfile] = useState(null);
     const [email, setEmail] = useState('');
     const [searchClicked, setSearchClicked] = useState(false);
+
+    const navigate = useNavigate(); 
 
     const headingRef = useRef(null);
     const searchBarRef = useRef(null);
@@ -42,7 +45,7 @@ export default function Homepage() {
     };
 
     const handleProfileSelect = (profile) => {
-        setSelectedProfile(profile);
+        navigate(profile.name);
     };
 
     const filteredProfiles = professors.filter(profile =>
