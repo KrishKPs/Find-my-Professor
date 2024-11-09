@@ -5,8 +5,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import axios from 'axios'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useNavigate } from 'react-router-dom'
 
 export default function AdminSignup() {
+
+  const navigate = useNavigate(); 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -50,6 +53,8 @@ export default function AdminSignup() {
       try {
         const response = await axios.post('http://localhost:3087/adminsignup', formData)  
         console.log(response.data)  
+        localStorage.setItem ('token', response.data.token) ;  
+        navigate('/admindashboard') ;  
         alert('Registration successful')  
 
 
