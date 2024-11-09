@@ -14,6 +14,7 @@ const usersignup = require('../Functions/usersignup');
 const seeallprofessor = require('../Functions/seeallprofessor');
 const schoolviseprofessor = require('../Functions/schoolviseprofessor');
 const seewho = require('../Functions/seewho');
+const seeone = require('../Functions/seeone');
 
 const router = express.Router(); 
 
@@ -37,6 +38,7 @@ router.get('/schoolprofessor/:schoolname' ,  schoolviseprofessor)
 
 router.get('/seeallprofessor' , seeallprofessor)
 router.post ('/seewho' , seewho)
+router.get ('/seeone/:id' , seeone)
 
 
 module.exports  = router;     
