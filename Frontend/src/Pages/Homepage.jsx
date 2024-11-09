@@ -45,7 +45,7 @@ export default function Homepage() {
     };
 
     const handleProfileSelect = (profile) => {
-        navigate(profile.name);
+        navigate(profile._id);
     };
 
     const filteredProfiles = professors.filter(profile =>
