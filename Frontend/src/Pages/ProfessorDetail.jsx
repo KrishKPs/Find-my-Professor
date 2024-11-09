@@ -1,65 +1,114 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    AiOutlineMail,
+    AiOutlineCalendar,
+    AiOutlineHome,
+    AiOutlineUser,
+    AiOutlineCheckCircle,
+} from 'react-icons/ai';
 
-export default function dataDetail({data}) {
+export default function ProfessorDetail() {
     const { id } = useParams();
-    
-    // // For now, use hardcoded data
-    // const data = {
-    //     name: "Dr. John Doe",
-    //     email: "john.doe@example.com",
-    //     category: "data",
-    //     college_name: "XYZ University",
-    //     profile_photo: "https://st3.depositphotos.com/15648834/17930/v/450/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg",
-    //     major: "Computer Science",
-    //     location: "Building A, Room 123",
-    //     office_hours: "Mon, Wed, Fri - 2:00 PM to 4:00 PM",
-    //     available: "Available",
-    //     verification: "Not-Verified",
-    // };
+    const navigate = useNavigate();
+
+    // Use the provided data
+    const professor = {
+        name: "Yug Patel",
+        email: "yug@gmail.com",
+        college_name: "Middlesex",
+        category: "Professor",
+        profile_photo:
+            "https://st3.depositphotos.com/15648834/17930/v/450/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg",
+        major: "Computer Science",
+        location: "MLksdsd Hall",
+        office_hours: [
+            {
+                day: "Monday",
+                startTime: "10:00 AM",
+                endTime: "11:00 AM",
+            },
+        ],
+        available: "Not-Available",
+        verification: "Verified",
+    };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 flex flex-col items-center text-gray-200 p-8">
-            <div className="max-w-4xl w-full bg-gray-800 rounded-lg shadow-xl p-8">
-                <div className="flex items-center space-x-8">
-                    <img
-                        src={data.profile_photo}
-                        alt="Profile"
-                        className="w-32 h-32 rounded-full"
-                    />
-                    <div>
-                        <h1 className="text-3xl font-bold">{data.name}</h1>
-                        <p className="text-gray-400">{data.category}</p>
-                        <p className="text-gray-500">{data.college_name}</p>
-                    </div>
-                </div>
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 flex items-center justify-center py-12 px-4">
+            <div className="max-w-5xl w-full">
+                <Button
+                    className="mb-8 bg-gray-700 text-white hover:bg-gray-600 flex items-center space-x-2 px-4 py-2 rounded-lg"
+                    onClick={() => navigate('/homepage')}
+                >
+                    <AiOutlineHome className="text-lg" />
+                    <span className="font-medium">Back to Home</span>
+                </Button>
 
-                <div className="mt-6 space-y-4">
-                    <div>
-                        <h2 className="text-xl font-semibold">Major</h2>
-                        <p className="text-gray-400">{data.major}</p>
+                <Card className="relative bg-gray-800 text-gray-200 rounded-lg shadow-lg p-6 md:p-8">
+                    {/* Availability Badge */}
+                    <div className="absolute top-6 right-6">
+                        <div
+                            className={`flex items-center space-x-1 text-sm font-semibold ${
+                                professor.available === "Available" ? "text-green-500" : "text-red-500"
+                            }`}
+                        >
+                            <AiOutlineCheckCircle className="text-lg" />
+                            <span>{professor.available}</span>
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-xl font-semibold">Location</h2>
-                        <p className="text-gray-400">{data.location}</p>
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-semibold">Office Hours</h2>
-                        <p className="text-gray-400">{data.office_hours}</p>
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-semibold">Availability</h2>
-                        <p className="text-gray-400">{data.available}</p>
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-semibold">Verification</h2>
-                        <p className="text-gray-400">{data.verification}</p>
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-semibold">Contact</h2>
-                        <p className="text-gray-400">{data.email}</p>
-                    </div>
-                </div>
+
+                    <CardHeader>
+                        <div className="flex items-center space-x-8">
+                            <img
+                                src={professor.profile_photo}
+                                alt="Profile"
+                                className="w-28 h-28 rounded-full border-4 border-gray-700 shadow-md"
+                            />
+                            <div>
+                                <CardTitle className="text-3xl font-bold text-white">{professor.name}</CardTitle>
+                                <p className="text-lg font-medium text-gray-400">{professor.category}</p>
+                                <p className="text-sm text-gray-500">{professor.college_name}</p>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="flex items-start space-x-3">
+                            <AiOutlineUser className="text-2xl text-gray-400" />
+                            <div>
+                                <h2 className="text-xl font-semibold">Major</h2>
+                                <p className="text-gray-400 text-base">{professor.major}</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                            <AiOutlineCalendar className="text-2xl text-gray-400" />
+                            <div>
+                                <h2 className="text-xl font-semibold">Office Hours</h2>
+                                {/* Map over office_hours array */}
+                                {professor.office_hours.map((hours, index) => (
+                                    <p key={index} className="text-gray-400 text-base">
+                                        {hours.day}: {hours.startTime} - {hours.endTime}
+                                    </p>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                            <AiOutlineHome className="text-2xl text-gray-400" />
+                            <div>
+                                <h2 className="text-xl font-semibold">Location</h2>
+                                <p className="text-gray-400 text-base">{professor.location}</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start space-x-3">
+                            <AiOutlineMail className="text-2xl text-gray-400" />
+                            <div>
+                                <h2 className="text-xl font-semibold">Contact</h2>
+                                <p className="text-gray-400 text-base">{professor.email}</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );
