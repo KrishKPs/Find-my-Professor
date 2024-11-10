@@ -20,13 +20,55 @@ const UserSchema = mongoose.Schema({
     college_name : {
         type: String,
         required: true,
-    }, 
+    },
+    student_id : {
+        type: String,
+        required: true,
+    
+    },  
     password : {
         type: String,
         required: true,
     } 
 
-})
+}); 
+
+const appointmentSchema = mongoose.Schema({
+    professorId: { 
+      type: String, 
+      ref: 'Professor', 
+      required: true 
+    },
+    studentId: { 
+      type: String, 
+      ref: 'Student', 
+      required: true 
+    },
+    day: { 
+      type: String, 
+      enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], 
+      required: true 
+    },
+    startTime: { 
+      type: String, 
+      required: true 
+    },
+    endTime: { 
+      type: String, 
+      required: true 
+    },
+    status: { 
+      type: String, 
+      enum: ['Pending', 'Confirmed', 'Cancelled'], 
+      default: 'Pending' 
+    },
+    createdAt: { 
+      type: Date, 
+      default: Date.now 
+    }
+  });
+
+
 const ProfessorSchema = mongoose.Schema({
 
     name : {
@@ -142,12 +184,14 @@ const ProfessorDetailSchema = mongoose.Schema({
 const Professor = mongoose.model('Professor', ProfessorSchema);  
 const Admin = mongoose.model('Admin', adminSchema); 
 const ProfessorDetail = mongoose.model('ProfessorDetail', ProfessorDetailSchema);  
-const User = mongoose.model('User', UserSchema);      
+const User = mongoose.model('User', UserSchema);  
+const Appoinments = mongoose.model('Appoinments', appointmentSchema);        
 
 
 module.exports = {
     Professor,
     Admin,
     ProfessorDetail  , 
-    User 
+    User , 
+    Appoinments
 };   
