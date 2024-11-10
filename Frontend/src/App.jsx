@@ -6,6 +6,8 @@ import AcademicFinder from './Pages/Finder'
 import Homepage from './Pages/Homepage'
 import { OneProfessor } from './Pages/OneProfessor'
 import Professor_homepage from './Pages/Professor_homepage'
+import AdminSignup from './Pages/SignupAdmin'
+import { AdminDashboard } from './Pages/Admindashboard'
 
 function App() {
 
@@ -21,6 +23,8 @@ function App() {
       <Route path='/homepage' element ={<Homepage/>}/>
       <Route path='/homepage/:id' element ={<OneProfessor/>}/>  
       <Route path='/professor' element ={<Professor_homepage/>}/>
+      <Route path='/adminsignup' element={<AdminSignup/>}/>
+      <Route path='/admindashboard' element={<AdminDashboard/>}/>
 
       
      </Routes>
