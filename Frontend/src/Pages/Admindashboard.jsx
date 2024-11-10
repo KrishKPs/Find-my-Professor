@@ -1,30 +1,44 @@
 import { useEffect, useState } from "react";
 import axios from 'axios';   
+import ProfessorCard from "./professorcard";
 
 export function AdminDashboard() {
-    const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token');
+  const [Professor, setProfessor] = useState([]);  
+  const [refreshKey, setRefreshKey] = useState(0);  // State to trigger refresh
 
-    const [Professor , setProfessor] = useState([]) ;    
+  const getUnverifiedProfessor = async () => {
+    try {
+      const response = await axios.get('http://localhost:3087/seeprofessor', {
+        headers: {
+          Authorization: `${token}`
+        }
+      });
+      console.log(response.data.unverfied_professors);
+      setProfessor(response.data.unverfied_professors);
+    } catch (error) {
+      console.error('Error fetching professors:', error);
+    }
+  };
 
-    const getUnverifiedProfessor = async () => {
-        const response = await axios.get('http://localhost:3087/seeprofessor', {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-        .then(response => {
-            console.log(response.data.unverfied_professors);
-            setProfessor(response.data.unverfied_professors);
-        })  
-    };
+  useEffect(() => {
+    getUnverifiedProfessor();   
+  }, [refreshKey]); // Refreshes when refreshKey changes
 
-    useEffect(() => {
-        getUnverifiedProfessor();   
-    }, [])
+  const handleRefresh = () => {
+    setRefreshKey((prevKey) => prevKey + 1);  // Increment refreshKey to trigger useEffect
+  };
 
-    return (
-        <>
-            <h1>Admin Dashboard</h1>
-        </>
-    );
+  return (
+    <>
+      <h1>Hello</h1>
+      {Professor.map((professorone, index) => (
+        <ProfessorCard 
+          key={professorone._id} 
+          professor={professorone} 
+          onVerificationUpdate={handleRefresh} // Pass refresh function
+        />
+      ))}
+    </>
+  );
 }

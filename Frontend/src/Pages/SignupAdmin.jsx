@@ -51,17 +51,20 @@ export default function AdminSignup() {
       console.log('Form submitted:', formData)
      
       try {
-        const response = await axios.post('http://localhost:3087/adminsignup', formData)  
-        console.log(response.data)  
-        localStorage.setItem ('token', response.data.token) ;  
-        navigate('/admindashboard') ;  
-        alert('Registration successful')  
-
+        await axios.post('http://localhost:3087/adminsignup', formData)
+        .then(response => {
+          localStorage.setItem('token', response.data.token);
+          navigate('/admindashboard');
+          alert('Registration successful');
+          console.log('Form submitted:', formData);
+        });
+ 
 
         
       } catch (error) {
         
         alert (error) 
+        console.log (error)
         
       }
      
