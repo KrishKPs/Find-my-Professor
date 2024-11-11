@@ -84,6 +84,10 @@ export default function ProfessorDetail({ data }) {
                     day,
                     startTime,
                     endTime,
+                }, {
+                    headers : {
+                        Authorization: localStorage.getItem('token') 
+                    }
                 });
 
                 setConfirmationMessage(response.data.message || "Appointment booked successfully");
