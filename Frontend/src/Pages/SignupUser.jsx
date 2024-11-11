@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function UserSignup() {
   const [formData, setFormData] = useState({
@@ -15,6 +16,8 @@ export default function UserSignup() {
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+
+  const navigate = useNavigate();   
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,6 +58,8 @@ export default function UserSignup() {
         const response = await axios.post('http://localhost:3087/usersignup', formData);
         console.log(response.data);
         alert('Registration successful');
+        localStorage.setItem('token' , response.data.token);     
+        navigate ('/homepage'); 
       } catch (error) {
         alert(error);
       }
