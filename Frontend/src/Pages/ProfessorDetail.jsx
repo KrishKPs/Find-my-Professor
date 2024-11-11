@@ -32,18 +32,23 @@ const generateTimeSlots = (start, end) => {
         return date;
     };
 
+    const formatTime = (date) => {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    };
+
     const currentTime = parseTime(start);
     const endTime = parseTime(end);
 
     while (currentTime < endTime) {
-        const slotStart = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const slotStart = formatTime(currentTime);
         currentTime.setMinutes(currentTime.getMinutes() + 15);
-        const slotEnd = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const slotEnd = formatTime(currentTime);
         slots.push(`${slotStart} - ${slotEnd}`);
     }
 
     return slots;
 };
+
 
 export default function ProfessorDetail({ data }) {
     const navigate = useNavigate();
@@ -66,30 +71,69 @@ export default function ProfessorDetail({ data }) {
             const day = officeHours.find((hours) =>
                 generateTimeSlots(hours.startTime, hours.endTime).includes(selectedSlot)
             ).day;
-
+    
             try {
                 const professorId = data._id;
                 const professorName = data.name;
                 const professorEmail = data.email;
-
+    
                 // Replace with actual student's email and name from your authentication or context
                 const studentEmail = "your-student-email@example.com";
                 const studentName = "Your Student Name";
-
-                const response = await axios.post(`http://localhost:3087/bookappoinment/${professorId}`, {
-                    student_email: studentEmail,
-                    student_name: studentName,
-                    professor: professorName,
-                    professor_email: professorEmail,
-                    day,
-                    startTime,
-                    endTime,
-                }, {
-                    headers : {
-                        Authorization: localStorage.getItem('token') 
+    
+                // Helper function to convert "AM/PM" time to a comparable Date object
+                const convertToComparableTime = (timeStr) => {
+                    const [time, modifier] = timeStr.split(" ");
+                    let [hours, minutes] = time.split(":").map(Number);
+    
+                    if (modifier === "PM" && hours !== 12) {
+                        hours += 12;
+                    } else if (modifier === "AM" && hours === 12) {
+                        hours = 0;
                     }
-                });
-
+    
+                    const date = new Date();
+                    date.setHours(hours, minutes, 0, 0);
+                    return date;
+                };
+    
+                // Convert the start and end times from the office hours to comparable Date objects
+                const officeHoursStart = convertToComparableTime(
+                    officeHours.find((hours) => hours.day === day).startTime
+                );
+                const officeHoursEnd = convertToComparableTime(
+                    officeHours.find((hours) => hours.day === day).endTime
+                );
+    
+                // Convert the selected appointment times to comparable Date objects
+                const appointmentStart = convertToComparableTime(startTime);
+                const appointmentEnd = convertToComparableTime(endTime);
+    
+                // Check if the appointment times are within the office hours
+                if (appointmentStart < officeHoursStart || appointmentEnd > officeHoursEnd) {
+                    setConfirmationMessage("Requested time is outside of the professor's office hours.");
+                    setLoading(false);
+                    return;
+                }
+    
+                const response = await axios.post(
+                    `http://localhost:3087/bookappoinment/${professorId}`,
+                    {
+                        student_email: studentEmail,
+                        student_name: studentName,
+                        professor: professorName,
+                        professor_email: professorEmail,
+                        day,
+                        startTime,
+                        endTime,
+                    },
+                    {
+                        headers: {
+                            Authorization: localStorage.getItem('token'),
+                        },
+                    }
+                );
+    
                 setConfirmationMessage(response.data.message || "Appointment booked successfully");
             } catch (error) {
                 setConfirmationMessage(error.response?.data?.error || "Failed to book appointment");
@@ -99,6 +143,7 @@ export default function ProfessorDetail({ data }) {
             }
         }
     };
+    
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 flex items-center justify-center py-12 px-4">
