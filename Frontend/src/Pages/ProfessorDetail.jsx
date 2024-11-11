@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import {
     AiOutlineMail,
@@ -10,39 +9,93 @@ import {
     AiOutlineUser,
     AiOutlineCheckCircle,
     AiOutlineSchedule,
+    AiOutlineClose,
 } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const generateTimeSlots = (start, end) => {
+    const slots = [];
+
+    const parseTime = (timeStr) => {
+        const [time, modifier] = timeStr.split(" ");
+        let [hours, minutes] = time.split(":").map(Number);
+
+        if (modifier === "PM" && hours !== 12) {
+            hours += 12;
+        } else if (modifier === "AM" && hours === 12) {
+            hours = 0;
+        }
+
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        return date;
+    };
+
+    const currentTime = parseTime(start);
+    const endTime = parseTime(end);
+
+    while (currentTime < endTime) {
+        const slotStart = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        currentTime.setMinutes(currentTime.getMinutes() + 15);
+        const slotEnd = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        slots.push(`${slotStart} - ${slotEnd}`);
+    }
+
+    return slots;
+};
+
 export default function ProfessorDetail({ data }) {
     const navigate = useNavigate();
     const [openDialog, setOpenDialog] = useState(false);
-    const [appointmentData, setAppointmentData] = useState({
-        studentId: '',
-        day: '',
-        startTime: '',
-        endTime: ''
-    });
+    const [selectedSlot, setSelectedSlot] = useState(null);
+    const [confirmationMessage, setConfirmationMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setAppointmentData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+    const officeHours = data.office_hours || [];
+
+    const handleSlotClick = (slot) => {
+        setSelectedSlot(slot);
+        setConfirmationMessage("");
     };
 
-    const handleSubmit = async () => {
-        try {
-            const professorId = data._id; // Using the professor's ID
-            const response = await axios.post(`http://localhost:3087/bookappoinment/${professorId}`, appointmentData);
-            alert(response.data.message);
-            setOpenDialog(false);
-        } catch (error) {
-            alert(error.response?.data?.error || 'Failed to book appointment');
+    const handleConfirmAppointment = async () => {
+        if (selectedSlot) {
+            setLoading(true);
+            const [startTime, endTime] = selectedSlot.split(" - ");
+            const day = officeHours.find((hours) =>
+                generateTimeSlots(hours.startTime, hours.endTime).includes(selectedSlot)
+            ).day;
+
+            try {
+                const professorId = data._id;
+                const professorName = data.name;
+                const professorEmail = data.email;
+
+                // Replace with actual student's email and name from your authentication or context
+                const studentEmail = "your-student-email@example.com";
+                const studentName = "Your Student Name";
+
+                const response = await axios.post(`http://localhost:3087/bookappoinment/${professorId}`, {
+                    student_email: studentEmail,
+                    student_name: studentName,
+                    professor: professorName,
+                    professor_email: professorEmail,
+                    day,
+                    startTime,
+                    endTime,
+                });
+
+                setConfirmationMessage(response.data.message || "Appointment booked successfully");
+            } catch (error) {
+                setConfirmationMessage(error.response?.data?.error || "Failed to book appointment");
+            } finally {
+                setLoading(false);
+                setSelectedSlot(null);
+            }
         }
     };
-    
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 flex items-center justify-center py-12 px-4">
             <div className="max-w-5xl w-full relative">
@@ -55,11 +108,11 @@ export default function ProfessorDetail({ data }) {
                 </Button>
 
                 <Card className="relative bg-gray-800 text-gray-200 rounded-lg shadow-lg p-6 md:p-8">
-                    {/* Availability Badge */}
                     <div className="absolute top-6 right-6">
                         <div
-                            className={`flex items-center space-x-1 text-sm font-semibold ${data.available === "Available" ? "text-green-500" : "text-red-500"
-                                }`}
+                            className={`flex items-center space-x-1 text-sm font-semibold ${
+                                data.available === 'Available' ? 'text-green-500' : 'text-red-500'
+                            }`}
                         >
                             <AiOutlineCheckCircle className="text-lg" />
                             <span>{data.available}</span>
@@ -92,8 +145,8 @@ export default function ProfessorDetail({ data }) {
                             <AiOutlineCalendar className="text-2xl text-gray-400" />
                             <div>
                                 <h2 className="text-xl font-semibold">Office Hours</h2>
-                                {data.office_hours?.length > 0 ? (
-                                    data.office_hours.map((hours, index) => (
+                                {officeHours?.length > 0 ? (
+                                    officeHours.map((hours, index) => (
                                         <p key={index} className="text-gray-400 text-base">
                                             {hours.day}: {hours.startTime} - {hours.endTime}
                                         </p>
@@ -120,7 +173,6 @@ export default function ProfessorDetail({ data }) {
                     </CardContent>
                 </Card>
 
-                {/* Schedule Appointment Button */}
                 <Button
                     className="fixed bottom-6 right-6 bg-green-600 text-white hover:bg-green-500 px-4 py-2 rounded-full flex items-center"
                     onClick={() => setOpenDialog(true)}
@@ -129,44 +181,52 @@ export default function ProfessorDetail({ data }) {
                     Schedule Appointment
                 </Button>
 
-                {/* Dialog for Scheduling Appointment */}
                 <Dialog open={openDialog} onOpenChange={setOpenDialog}>
                     <DialogContent className="bg-gray-800 text-white rounded-lg p-6 space-y-4 shadow-xl">
-                        <DialogTitle className="text-2xl font-bold">Book an Appointment</DialogTitle>
-                        <Input
-                            name="studentId"
-                            placeholder="Student ID"
-                            value={appointmentData.studentId}
-                            onChange={handleInputChange}
-                            className="bg-gray-700 text-white"
-                        />
-                        <Input
-                            name="day"
-                            placeholder="Day (e.g., Monday)"
-                            value={appointmentData.day}
-                            onChange={handleInputChange}
-                            className="bg-gray-700 text-white"
-                        />
-                        <Input
-                            name="startTime"
-                            placeholder="Start Time (e.g., 10:00 AM)"
-                            value={appointmentData.startTime}
-                            onChange={handleInputChange}
-                            className="bg-gray-700 text-white"
-                        />
-                        <Input
-                            name="endTime"
-                            placeholder="End Time (e.g., 10:30 AM)"
-                            value={appointmentData.endTime}
-                            onChange={handleInputChange}
-                            className="bg-gray-700 text-white"
-                        />
-                        <Button
-                            onClick={handleSubmit}
-                            className="w-full bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg"
-                        >
-                            Confirm Appointment
-                        </Button>
+                        <DialogTitle className="text-2xl font-bold flex justify-between items-center">
+                            Select a Time Slot
+                            <AiOutlineClose
+                                className="cursor-pointer text-red-400 hover:text-red-500"
+                                onClick={() => setOpenDialog(false)}
+                            />
+                        </DialogTitle>
+                        <div className="space-y-4">
+                            {officeHours.map((hours, index) => (
+                                <div key={index} className="space-y-2">
+                                    <h3 className="text-lg font-semibold text-white">{hours.day}</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {generateTimeSlots(hours.startTime, hours.endTime).map((slot, slotIndex) => (
+                                            <Button
+                                                key={slotIndex}
+                                                className={`px-3 py-2 rounded-md text-sm ${
+                                                    selectedSlot === slot
+                                                        ? 'bg-blue-600 text-white'
+                                                        : 'bg-gray-700 text-white hover:bg-gray-600'
+                                                }`}
+                                                onClick={() => handleSlotClick(slot)}
+                                            >
+                                                {slot}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        {selectedSlot && (
+                            <div className="mt-4">
+                                <p className="text-gray-300 mb-2">Selected Slot: {selectedSlot}</p>
+                                <Button
+                                    className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md"
+                                    onClick={handleConfirmAppointment}
+                                    disabled={loading}
+                                >
+                                    {loading ? "Booking..." : "Confirm Appointment"}
+                                </Button>
+                            </div>
+                        )}
+                        {confirmationMessage && (
+                            <p className="mt-4 text-green-500 font-semibold">{confirmationMessage}</p>
+                        )}
                     </DialogContent>
                 </Dialog>
             </div>
