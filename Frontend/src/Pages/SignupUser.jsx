@@ -17,7 +17,7 @@ export default function UserSignup() {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
-  const navigate = useNavigate();   
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -58,8 +58,8 @@ export default function UserSignup() {
         const response = await axios.post('http://localhost:3087/usersignup', formData);
         console.log(response.data);
         alert('Registration successful');
-        localStorage.setItem('token' , response.data.token);     
-        navigate ('/homepage'); 
+        localStorage.setItem('token', response.data.token);
+        navigate('/homepage');
       } catch (error) {
         alert(error);
       }
@@ -170,9 +170,12 @@ export default function UserSignup() {
         </form>
         <p className="mt-2 text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <span
+            onClick={() => navigate('/userlogin')}
+            className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
+          >
             Log in
-          </a>
+          </span>
         </p>
       </div>
     </div>

@@ -1,87 +1,63 @@
-import React, { useState, useEffect } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import axios from 'axios'  
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginUser() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-   
-  })
-  const [errors, setErrors] = useState({})
-  const [showPassword, setShowPassword] = useState(false)
+  });
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
-  const navigate = useNavigate()
-
-
-
-
- 
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-    validateField(name, value)
-  }
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    validateField(name, value);
+  };
 
   const validateField = (name, value) => {
-    let error = ''
+    let error = '';
     switch (name) {
       case 'email':
-        error = /\S+@\S+\.\S+/.test(value) ? '' : 'Invalid email format'
-        break
+        error = /\S+@\S+\.\S+/.test(value) ? '' : 'Invalid email format';
+        break;
       case 'password':
-        error = value.length >= 6 ? '' : 'Password must be at least 6 characters long'
-        break
-     
+        error = value.length >= 6 ? '' : 'Password must be at least 6 characters long';
+        break;
       default:
-        break
+        break;
     }
-    setErrors(prev => ({ ...prev, [name]: error }))
-  }
+    setErrors(prev => ({ ...prev, [name]: error }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-
-  
-   
-   
-
-
-      try {
-
-        const response = await axios.post('http://localhost:3087/userlogin', formData , ) 
-        console.log(response.data.token) 
-
-        localStorage.setItem('token', response.data.token)   
-        alert ('Login successful')  
-        navigate ('/homepage')
-        console.log('Form submitted:', formData) 
-        
-      } catch (error) {
-
-        if (error.response) {
-          console.log(error.response.data)
-          alert(error.response.data.message)   
-        } 
-        
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:3087/userlogin', formData);
+      console.log(response.data.token);
+      localStorage.setItem('token', response.data.token);
+      alert('Login successful');
+      navigate('/homepage');
+      console.log('Form submitted:', formData);
+    } catch (error) {
+      if (error.response) {
+        console.log(error.response.data);
+        alert(error.response.data.message);
       }
-
-      
-    
-
-
-    
-  }
+    }
+  };
 
   const isFormValid = () => {
-    return Object.values(formData).every(value => value !== '') && Object.values(errors).every(error => error === '')
-  }
+    return Object.values(formData).every(value => value !== '') && Object.values(errors).every(error => error === '');
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -136,7 +112,7 @@ export default function LoginUser() {
               </div>
               {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
             </div>
-            <Button type="submit" className="w-full" onClick={handleSubmit}>
+            <Button type="submit" className="w-full" disabled={!isFormValid()}>
               Log in
             </Button>
           </form>
@@ -147,12 +123,15 @@ export default function LoginUser() {
           </Button>
           <p className="text-sm text-center text-gray-600">
             Don't have an account?{' '}
-            <Button variant="link" className="p-0 text-primary">
+            <span
+              onClick={() => navigate('/usersignup')}
+              className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
+            >
               Sign up
-            </Button>
+            </span>
           </p>
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

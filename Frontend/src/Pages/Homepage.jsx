@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineSearch } from "react-icons/ai";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -7,9 +7,6 @@ export default function Homepage() {
     const [professors, setProfessors] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
-    const [selectedProfile, setSelectedProfile] = useState(null);
-    const [email, setEmail] = useState('');
-    const [searchClicked, setSearchClicked] = useState(false);
 
     const navigate = useNavigate();
 
@@ -52,8 +49,18 @@ export default function Homepage() {
                     <div className="text-2xl font-semibold">Find My Professor</div>
                     <div className="hidden md:flex space-x-6">
                         <a href="#home" className="hover:text-gray-100">Home</a>
-                        <a href="#about" className="hover:text-gray-100">About</a>
-                        <a href="#contact" className="hover:text-gray-100">Contact</a>
+                        <span
+                            onClick={() => navigate('/usersignup')}
+                            className="hover:text-gray-100 cursor-pointer"
+                        >
+                            Signup
+                        </span>
+                        <span
+                            onClick={() => navigate('/userlogin')}
+                            className="hover:text-gray-100 cursor-pointer"
+                        >
+                            Login
+                        </span>
                     </div>
                     <button className="md:hidden text-gray-300 hover:text-gray-100">
                         <AiOutlineSearch size={24} />
@@ -76,7 +83,6 @@ export default function Homepage() {
                         onChange={handleSearch}
                     />
                     <button
-                        onClick={() => setSearchClicked(true)}
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-gray-700 text-gray-200 p-2 rounded-full hover:bg-gray-600 transition-colors"
                     >
                         <AiOutlineSearch size={20} />
@@ -102,7 +108,7 @@ export default function Homepage() {
 
                 {/* Professor Cards */}
                 <div className="w-full max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4">
-                    {filteredProfiles.map((profile, index) => (
+                    {filteredProfiles.map((profile) => (
                         <div
                             key={profile.id}
                             className="bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-2xl cursor-pointer"
