@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import axios from 'axios'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useNavigate } from 'react-router-dom'
 
 export default function ProfessorSignup() {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ export default function ProfessorSignup() {
   })
   const [errors, setErrors] = useState({})
   const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -62,6 +64,8 @@ export default function ProfessorSignup() {
         const response = await axios.post('http://localhost:3087/professorsignup', formData)  
         console.log(response.data)  
         alert('Registration successful')  
+        navigate('/professor')
+        localStorage.setItem('authorization', response.data.token);
 
 
         
@@ -140,7 +144,7 @@ export default function ProfessorSignup() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Professor">Professor</SelectItem>
-                  <SelectItem value="Academic Adviso">Academic Advisor</SelectItem>
+                  <SelectItem value="Academic Advisor">Academic Advisor</SelectItem>
                   <SelectItem value="Consultant">Consultant</SelectItem>
                 </SelectContent>
               </Select>
@@ -173,7 +177,7 @@ export default function ProfessorSignup() {
           </div>
 
           <div>
-            <Button type="submit" className="w-full" >
+            <Button type="submit" className="w-full" onClick >
               Sign Up
             </Button>
           </div>
