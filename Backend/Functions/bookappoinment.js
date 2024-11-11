@@ -1,8 +1,12 @@
-const { ProfessorDetail, Appoinments } = require("../db");
+const { ProfessorDetail, Appoinments, User } = require("../db");
 
 async function bookAppointment(req, res) {
     const body = req.body; 
-    const professorId = req.params.professorid;   
+    const professorId = req.params.professorid; 
+    
+    const student = req.user; 
+
+    const studentfind = await User.findOne ({ email : student  });   
   
     // Validate if the professor exists
     const findProfessor = await ProfessorDetail.findOne({ _id: professorId });  
@@ -28,9 +32,10 @@ async function bookAppointment(req, res) {
   
     // Check if an appointment already exists for the given slot
     const appointmentExists = await Appoinments.findOne({
-      professorId: professorId,
+      professor: findProfessor.name,
       day: body.day,
       startTime: body.startTime,
+      status : "Pending"     
 
     });
   
@@ -42,8 +47,10 @@ async function bookAppointment(req, res) {
   
     // Create the appointment
     await Appoinments.create({
-      professorId: professorId, 
-      studentId: body.studentId, 
+      professor: findProfessor.name, 
+      professor_email : findProfessor.email , 
+      student_email : studentfind.email , 
+        student_name : studentfind.name ,   
       day: body.day, 
       startTime: body.startTime, 
       endTime: body.endTime
@@ -55,4 +62,3 @@ async function bookAppointment(req, res) {
   }
   
   module.exports = bookAppointment;
-  

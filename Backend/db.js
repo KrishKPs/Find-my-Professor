@@ -34,15 +34,27 @@ const UserSchema = mongoose.Schema({
 }); 
 
 const appointmentSchema = mongoose.Schema({
-    professorId: { 
+    professor: { 
       type: String, 
       ref: 'Professor', 
       required: true 
     },
-    studentId: { 
+    professor_email : {
+        type: String, 
+        ref: 'Professor', 
+        required: true 
+      },
+
+      student_name : {
+        type: String, 
+        ref: 'User', 
+        required: true 
+      }, 
+
+    student_email: { 
       type: String, 
-      ref: 'Student', 
-      required: true 
+      ref: 'User', 
+      required: true
     },
     day: { 
       type: String, 
@@ -92,7 +104,14 @@ const ProfessorSchema = mongoose.Schema({
     password : {
         type: String,
         required: true, 
-    } 
+    } , 
+
+    appoinments : [ {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref : 'Appoinments' 
+    }
+
+    ]
 })
 
 const adminSchema = mongoose.Schema({

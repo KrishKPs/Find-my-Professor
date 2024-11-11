@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import axios from 'axios'  
+import { useNavigate } from 'react-router-dom'
 
 export default function LoginUI() {
   const [formData, setFormData] = useState({
@@ -15,6 +16,8 @@ export default function LoginUI() {
   })
   const [errors, setErrors] = useState({})
   const [showPassword, setShowPassword] = useState(false)
+
+  const navigate = useNavigate()
 
 
 
@@ -54,9 +57,11 @@ export default function LoginUI() {
       try {
 
         const response = await axios.post('http://localhost:3087/professorlogin', formData) 
-        console.log(response.data) 
+        console.log(response.data.token) 
 
+        localStorage.setItem('token', response.data.token)   
         alert ('Login successful')  
+        navigate ('/professor')
         console.log('Form submitted:', formData) 
         
       } catch (error) {
