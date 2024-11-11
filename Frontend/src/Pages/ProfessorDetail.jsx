@@ -77,6 +77,21 @@ export default function ProfessorDetail({ data }) {
         setConfirmationMessage("");
     };
 
+
+const islogin = () => {
+
+    const token = localStorage.getItem('token');     
+
+    if ( !token ){
+        return false ; 
+    }
+    else {
+
+        return true ;   
+
+    }
+}
+
     const handleConfirmAppointment = async () => {
         if (selectedSlot) {
             setLoading(true);
@@ -219,7 +234,7 @@ export default function ProfessorDetail({ data }) {
 
                 <Button
                     className="fixed bottom-6 right-6 bg-green-600 text-white hover:bg-green-500 px-4 py-2 rounded-full flex items-center"
-                    onClick={() => setOpenDialog(true)}
+                    onClick={ !islogin? () => setOpenDialog(true) : () => navigate('/usersignup') }
                 >
                     <AiOutlineSchedule className="mr-2" />
                     Schedule Appointment
@@ -277,3 +292,6 @@ export default function ProfessorDetail({ data }) {
         </div>
     );
 }
+
+
+
