@@ -49,6 +49,19 @@ const generateTimeSlots = (start, end) => {
     return slots;
 };
 
+// Helper function to convert "AM/PM" time to 24-hour format
+function convertTo24HourString(time) {
+    const [timePart, modifier] = time.split(" ");
+    let [hours, minutes] = timePart.split(":").map(Number);
+
+    if (modifier === "PM" && hours !== 12) {
+        hours += 12;
+    } else if (modifier === "AM" && hours === 12) {
+        hours = 0;
+    }
+
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
 
 export default function ProfessorDetail({ data }) {
     const navigate = useNavigate();
@@ -67,55 +80,37 @@ export default function ProfessorDetail({ data }) {
     const handleConfirmAppointment = async () => {
         if (selectedSlot) {
             setLoading(true);
+
+            // Extract the start and end times from the selected slot
             const [startTime, endTime] = selectedSlot.split(" - ");
-            const day = officeHours.find((hours) =>
+            
+            // Convert to 24-hour format strings for the backend
+            const startTime24 = convertTo24HourString(startTime);
+            const endTime24 = convertTo24HourString(endTime);
+
+            // Find the office hours entry for the selected day
+            const officeHoursEntry = officeHours.find((hours) =>
                 generateTimeSlots(hours.startTime, hours.endTime).includes(selectedSlot)
-            ).day;
-    
+            );
+
+            if (!officeHoursEntry) {
+                setConfirmationMessage("Office hours entry not found for the selected day.");
+                setLoading(false);
+                return;
+            }
+
+            const day = officeHoursEntry.day;
+
             try {
                 const professorId = data._id;
                 const professorName = data.name;
                 const professorEmail = data.email;
-    
+
                 // Replace with actual student's email and name from your authentication or context
                 const studentEmail = "your-student-email@example.com";
                 const studentName = "Your Student Name";
-    
-                // Helper function to convert "AM/PM" time to a comparable Date object
-                const convertToComparableTime = (timeStr) => {
-                    const [time, modifier] = timeStr.split(" ");
-                    let [hours, minutes] = time.split(":").map(Number);
-    
-                    if (modifier === "PM" && hours !== 12) {
-                        hours += 12;
-                    } else if (modifier === "AM" && hours === 12) {
-                        hours = 0;
-                    }
-    
-                    const date = new Date();
-                    date.setHours(hours, minutes, 0, 0);
-                    return date;
-                };
-    
-                // Convert the start and end times from the office hours to comparable Date objects
-                const officeHoursStart = convertToComparableTime(
-                    officeHours.find((hours) => hours.day === day).startTime
-                );
-                const officeHoursEnd = convertToComparableTime(
-                    officeHours.find((hours) => hours.day === day).endTime
-                );
-    
-                // Convert the selected appointment times to comparable Date objects
-                const appointmentStart = convertToComparableTime(startTime);
-                const appointmentEnd = convertToComparableTime(endTime);
-    
-                // Check if the appointment times are within the office hours
-                if (appointmentStart < officeHoursStart || appointmentEnd > officeHoursEnd) {
-                    setConfirmationMessage("Requested time is outside of the professor's office hours.");
-                    setLoading(false);
-                    return;
-                }
-    
+
+                // Make the API call
                 const response = await axios.post(
                     `http://localhost:3087/bookappoinment/${professorId}`,
                     {
@@ -124,8 +119,8 @@ export default function ProfessorDetail({ data }) {
                         professor: professorName,
                         professor_email: professorEmail,
                         day,
-                        startTime,
-                        endTime,
+                        startTime: startTime24, // Use 24-hour format string
+                        endTime: endTime24,     // Use 24-hour format string
                     },
                     {
                         headers: {
@@ -133,9 +128,10 @@ export default function ProfessorDetail({ data }) {
                         },
                     }
                 );
-    
+
                 setConfirmationMessage(response.data.message || "Appointment booked successfully");
             } catch (error) {
+                console.error("Error response from backend:", error.response);
                 setConfirmationMessage(error.response?.data?.error || "Failed to book appointment");
             } finally {
                 setLoading(false);
@@ -143,7 +139,6 @@ export default function ProfessorDetail({ data }) {
             }
         }
     };
-    
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 flex items-center justify-center py-12 px-4">
