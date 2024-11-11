@@ -41,13 +41,13 @@ const ProfessorDetailForm = () => {
 
     try {
         const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3087/enterdetails', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json',
-             'authorization' :  token
+      
+
+        const response = await axios.post ('http://localhost:3087/enterdetails' , formData, {
+        headers: {
+          Authorization: `${token}`,
         },
-        body: JSON.stringify(formData),
-      });
+        }) 
 
       if (response.ok) {
         toast.success('Professor details created successfully!');

@@ -19,7 +19,11 @@ const ProfessorHomePage = () => {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('Token not found');
 
+        console.log (token); 
+
         const response = await axios.get('http://localhost:3087/getprofessor', {
+
+          
           headers: { Authorization: `${token}` },
         });
 
