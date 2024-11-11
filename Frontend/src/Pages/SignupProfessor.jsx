@@ -11,13 +11,13 @@ export default function ProfessorSignup() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-     college_name: '',
+    college_name: '',
     category: '',
     password: '',
   })
   const [errors, setErrors] = useState({})
   const [showPassword, setShowPassword] = useState(false)
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -59,24 +59,20 @@ export default function ProfessorSignup() {
     const formErrors = Object.values(errors).filter(error => error !== '')
     if (formErrors.length === 0) {
       console.log('Form submitted:', formData)
-     
+
       try {
-        const response = await axios.post('http://localhost:3087/professorsignup', formData)  
-        console.log(response.data)  
-        alert('Registration successful')  
-        navigate('/professor')
-        localStorage.setItem('authorization', response.data.token);
+        const response = await axios.post('http://localhost:3087/professorsignup', formData)
+        console.log(response.data)
+        alert('Registration successful')
+        // Save the token to localStorage
+        localStorage.setItem('token', response.data.token)
 
-
-        
+        // Navigate to professor detail form
+        navigate('/professorForm')
       } catch (error) {
-        
-        alert (error) 
-        
+        console.error(error)
+        alert('Error during registration')
       }
-     
-      
-
     } else {
       console.log('Form has errors, please correct them')
     }
@@ -177,7 +173,7 @@ export default function ProfessorSignup() {
           </div>
 
           <div>
-            <Button type="submit" className="w-full" onClick >
+            <Button type="submit" className="w-full" disabled={!isFormValid()}>
               Sign Up
             </Button>
           </div>
