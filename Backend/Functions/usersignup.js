@@ -31,6 +31,7 @@ async function usersignup (req, res) {
 
         name : person.name,  
         email : person.email, 
+        student_id : person.student_id , 
         college_name : person.college_name,   
         password : hashed,  
     })   
