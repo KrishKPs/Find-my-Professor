@@ -12,7 +12,13 @@ const PORT = process.env.PORT || 5000;
 const db = require('./db');  
 const userRoutes = require('./Route/index');  
 
-app.use('/', userRoutes);     
+app.use('/', userRoutes);  
+
+app.get ('/' , function (req,res) {
+
+    res.send ("Congrats YUG , Siddharth and Krish Great Work")
+
+})
 
 
 
