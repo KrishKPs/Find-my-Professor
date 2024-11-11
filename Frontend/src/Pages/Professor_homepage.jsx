@@ -1,151 +1,235 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Avatar } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { FaEdit, FaBell } from 'react-icons/fa';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { FaCheckCircle, FaClock, FaUser, FaEnvelope, FaBell, FaCaretDown, FaEdit } from 'react-icons/fa';
 
-const ProfessorHomepage = () => {
+const Trial = () => {
   const [professor, setProfessor] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [pendingRequests, setPendingRequests] = useState(0);
   const [appointments, setAppointments] = useState([]);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // State for edit mode
 
   useEffect(() => {
     const fetchProfessorData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('Token not found');
-
-        const response = await axios.get('http://localhost:3087/getprofessor', {
-          headers: { Authorization: `${token}` },
-        });
-        setProfessor(response.data.professor);
-      } catch (err) {
-        console.error('Error fetching professor data:', err);
-        setError(err.message || 'Failed to fetch data');
-      } finally {
-        setLoading(false);
-      }
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:3087/getprofessor', {
+        headers: { Authorization: token },
+      });
+      setProfessor(response.data.professor);
+      setLoading(false);
     };
 
     const fetchAppointments = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3087/seeappoinments', {
-          headers: { Authorization: `${token}` },
-        });
-        setAppointments(response.data.appointments);
-        setPendingRequests(response.data.appointments.filter(app => app.status === 'Pending').length);
-      } catch (err) {
-        console.error("Error fetching appointments:", err);
-      }
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:3087/seeappoinments', {
+        headers: { Authorization: token },
+      });
+      const appointmentsData = response.data.appoinments || [];
+      setAppointments(appointmentsData);
+      setPendingCount(appointmentsData.filter(appointment => appointment.status === 'Pending').length);
     };
 
     fetchProfessorData();
     fetchAppointments();
   }, []);
 
-  const handleBellClick = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+  const handleApproveAppointment = async (appointmentId, studentEmail) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.post(
+        'http://localhost:3087/approveappoinment',
+        { student_email: studentEmail },
+        { headers: { Authorization: token } }
+      );
+
+      if (response.data.msg === 'Appointment Approved') {
+        setAppointments((prevAppointments) =>
+          prevAppointments.map((appointment) =>
+            appointment._id === appointmentId
+              ? { ...appointment, status: 'Approved' }
+              : appointment
+          )
+        );
+        setPendingCount((prev) => prev - 1); // Decrease the pending count after approval
+      }
+    } catch (error) {
+      console.error('Error approving appointment:', error);
+    }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  const toggleDropdown = () => setShowDropdown(!showDropdown);
+
+  const toggleEditMode = () => setIsEditing(!isEditing); // Toggle edit mode
+
+  const handleSaveChanges = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.post(
+        'http://localhost:3087/updatedetails',
+        { ...professor },
+        { headers: { Authorization: token } }
+      );
+
+      if (response.data.msg === 'Professor updated') {
+        setIsEditing(false); // Exit edit mode
+      }
+    } catch (error) {
+      console.error('Error saving professor data:', error);
+    }
+  };
+
+  if (loading) return <Skeleton className="w-full h-64" />;
+
+  // Separate appointments into pending and approved
+  const pendingAppointments = appointments.filter((appointment) => appointment.status === 'Pending');
+  const approvedAppointments = appointments.filter((appointment) => appointment.status === 'Approved');
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Navbar */}
-<nav className="flex items-center justify-between bg-gray-800 p-4 text-white">
-  <h1 className="text-xl font-semibold">Professor Dashboard</h1>
-  <div className="relative">
-    <FaBell className="text-2xl cursor-pointer" onClick={handleBellClick} />
-    {pendingRequests > 0 && (
-      <Badge className="absolute top-0 right-0 bg-red-600 text-white rounded-full px-2 text-xs transform translate-x-1/2 -translate-y-1/2">
-        {pendingRequests}
-      </Badge>
-    )}
-    {isDropdownOpen && (
-      <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-10">
-        <h3 className="text-lg font-semibold mb-2">Pending Appointments</h3>
-        {appointments.length > 0 ? (
-          <ul>
-            {appointments
-              .filter(app => app.status === 'Pending') // Only show pending appointments
-              .map((appointment) => (
-                <li key={appointment._id} className="border-b py-2">
-                  <p><strong>Student:</strong> {appointment.student_name}</p>
-                  <p><strong>Day:</strong> {appointment.day}</p>
-                  <p><strong>Time:</strong> {appointment.startTime} - {appointment.endTime}</p>
-                </li>
-              ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">No pending appointments.</p>
-        )}
-      </div>
-    )}
-  </div>
-</nav>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto p-8">
-        <Card className="bg-white p-6 shadow-lg rounded-xl">
-          <div className="flex items-center mb-6">
-            <Avatar src={professor.profile_photo} alt={professor.name} className="w-24 h-24 mr-6" />
-            <div className="flex-grow">
+    <div className="bg-gradient-to-r from-blue-800 to-teal-600 min-h-screen text-white p-8 flex flex-col items-center relative">
+      {/* Professor Section */}
+      {professor && (
+        <Card className="w-full md:w-3/4 lg:w-1/2 p-8 bg-white text-gray-900 rounded-3xl shadow-lg transform transition-all hover:scale-105 duration-300 mb-12">
+          <div className="flex items-center mb-6 justify-between">
+            <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-3xl">
+              <FaUser />
+            </div>
+            <div className="flex-grow ml-6">
               {isEditing ? (
                 <input
-                  name="name"
+                  type="text"
                   value={professor.name}
                   onChange={(e) => setProfessor({ ...professor, name: e.target.value })}
-                  className="text-3xl font-semibold text-gray-800 bg-transparent border-b-2 border-gray-300 focus:ring-0"
+                  className="text-4xl font-bold text-gray-900 border-b-2 focus:outline-none"
                 />
               ) : (
-                <h2 className="text-3xl font-semibold text-gray-800">{professor.name}</h2>
+                <h2 className="text-4xl font-bold">{professor.name}</h2>
               )}
-              <p className="text-gray-600">{professor.category}</p>
-              <p className="text-gray-500">{professor.email}</p>
-              <p className="text-gray-400">{professor.college_name}</p>
+              <p className="text-lg font-medium text-gray-600">{professor.category}</p>
+              <p className="text-sm text-gray-500">{professor.email}</p>
+              <p className="text-sm text-gray-500">{professor.college_name}</p>
+            </div>
+            <div>
+              {isEditing ? (
+                <Button onClick={handleSaveChanges} className="bg-teal-600 text-white">
+                  Save Changes
+                </Button>
+              ) : (
+                <Button onClick={toggleEditMode} className="bg-yellow-600 text-white">
+                  <FaEdit className="mr-2" /> Edit Info
+                </Button>
+              )}
             </div>
           </div>
-
-          <div className="mt-4">
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">Major</h3>
-            <p className="text-gray-600">{professor.major}</p>
-
-            <h3 className="text-xl font-semibold text-gray-700 mt-4 mb-2">Location</h3>
-            <p className="text-gray-600">{professor.location}</p>
-
-            <h3 className="text-xl font-semibold text-gray-700 mt-4 mb-2">Office Hours</h3>
-            <ul>
-              {professor.office_hours.map((hour) => (
-                <li key={hour._id} className="text-gray-600">
-                  {hour.day}: {hour.startTime} - {hour.endTime}
-                </li>
+          <div className="mt-6">
+            <h3 className="text-xl font-semibold mb-2">Major</h3>
+            {isEditing ? (
+              <input
+                type="text"
+                value={professor.major}
+                onChange={(e) => setProfessor({ ...professor, major: e.target.value })}
+                className="text-gray-700"
+              />
+            ) : (
+              <p className="text-gray-700">{professor.major}</p>
+            )}
+            <h3 className="text-xl font-semibold mb-2 mt-4">Location</h3>
+            {isEditing ? (
+              <input
+                type="text"
+                value={professor.location}
+                onChange={(e) => setProfessor({ ...professor, location: e.target.value })}
+                className="text-gray-700"
+              />
+            ) : (
+              <p className="text-gray-700">{professor.location}</p>
+            )}
+            <h3 className="text-xl font-semibold mb-2 mt-4">Office Hours</h3>
+            <ul className="space-y-2">
+              {professor.office_hours?.map((hour) => (
+                <li key={hour._id} className="text-gray-700">{hour.day}: {hour.startTime} - {hour.endTime}</li>
               ))}
             </ul>
           </div>
+        </Card>
+      )}
 
-          <div className="mt-8 text-right">
-            {isEditing ? (
-              <Button onClick={() => setIsEditing(false)} className="bg-blue-600 text-white hover:bg-blue-700">
-                Save Changes
-              </Button>
+      {/* Floating Notification Bell */}
+      <div
+        onClick={toggleDropdown}
+        className="fixed top-4 right-4 bg-teal-500 p-4 rounded-full shadow-lg cursor-pointer hover:bg-teal-600 transition-all"
+      >
+        <FaBell className="text-white text-3xl" />
+        {pendingCount > 0 && (
+          <div className="absolute top-0 right-0 bg-yellow-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+            {pendingCount}
+          </div>
+        )}
+      </div>
+
+      {/* Sliding Panel for Pending Requests */}
+      {showDropdown && (
+        <div
+          className={`fixed top-0 right-0 w-80 h-full bg-white text-black shadow-lg transform transition-all duration-300 ${showDropdown ? 'translate-x-0' : 'translate-x-full'}`}
+        >
+          <div className="p-4 flex justify-between items-center">
+            <h3 className="text-lg font-semibold">Pending Requests</h3>
+            <Button onClick={toggleDropdown} className="bg-transparent text-black hover:text-gray-500">
+              <FaCaretDown className="text-xl" />
+            </Button>
+          </div>
+
+          <div className="p-4">
+            {pendingAppointments.length > 0 ? (
+              pendingAppointments.map((appointment) => (
+                <div
+                  key={appointment._id}
+                  className="flex justify-between items-center mb-4 p-3 bg-teal-100 rounded-lg"
+                >
+                  <div>
+                    <p className="text-sm font-semibold">{appointment.student_name}</p>
+                    <p className="text-xs">{appointment.day}: {appointment.startTime} - {appointment.endTime}</p>
+                  </div>
+                  <Button
+                    onClick={() => handleApproveAppointment(appointment._id, appointment.student_email)}
+                    className="bg-teal-600 text-xs text-white px-3 py-1 rounded-lg hover:bg-teal-700"
+                  >
+                    Approve
+                  </Button>
+                </div>
+              ))
             ) : (
-              <Button onClick={() => setIsEditing(true)} className="bg-yellow-600 text-white hover:bg-yellow-700">
-                <FaEdit className="mr-2" /> Edit Info
-              </Button>
+              <p className="text-sm text-gray-600">No pending requests.</p>
             )}
           </div>
-        </Card>
-      </main>
+        </div>
+      )}
+
+      {/* Appointments Section */}
+      <div className="w-full md:w-3/4 lg:w-1/2">
+        <h2 className="text-3xl font-bold text-white mb-6">Appointments</h2>
+
+        {/* Approved Appointments */}
+        {approvedAppointments.length > 0 && (
+          <div>
+            <h3 className="text-2xl font-semibold text-green-300 mb-4">Approved Appointments</h3>
+            {approvedAppointments.map((appointment) => (
+              <Card key={appointment._id} className="mb-4 p-4 bg-white text-gray-900 rounded-xl shadow-md">
+                <div className="flex items-center">
+                  <FaCheckCircle className="text-green-500 mr-2" />
+                  <p className="font-semibold text-gray-700">{appointment.day}: {appointment.startTime} - {appointment.endTime}</p>
+                </div>
+                <p className="text-gray-600">Student: {appointment.student_name}</p>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default ProfessorHomepage;
+export default Trial;
