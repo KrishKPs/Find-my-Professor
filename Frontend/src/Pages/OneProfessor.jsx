@@ -8,15 +8,23 @@ export function OneProfessor(){
     const id = useParams();
     
 
-    const[data, setData] = useState([]);
+    const[data, setData] = useState({});
 
     const handleOnClick = async () => {
-        const response = await axios.get(`http://localhost:3087/seeone/${id.id}`)
-        setData(response.data.professor);
-        console.log(response.data.professor);
-     }
+        try {
+            const response = await axios.get(`http://localhost:3087/seeone/${id.id}`);
+            if (response.data && response.data.professor) {
+                setData(response.data.professor);
+            } else {
+                console.error("Professor data not found");
+            }
+        } catch (error) {
+            console.error("Error fetching professor details:", error);
+        }
+    };
 
      useEffect(() => {
+
         console.log(id.id);
         
         handleOnClick();
