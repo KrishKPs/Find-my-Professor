@@ -12,6 +12,7 @@ import LoginUser from './Pages/Loginuser'
 import UserSignup from './Pages/SignupUser'
 import ProfessorDetail from './Pages/ProfessorDetail'
 import ProfessorDetailForm from './Pages/ProfessorDetailForm'
+import ProfessorDashboard from './Pages/Professor_Dashboard'
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
       <Route path='/homepage' element ={<Homepage/>}/>
       <Route path='/homepage/:id' element ={<OneProfessor/>}/>  
       <Route path='/professor' element ={<ProfessorDetail/>}/>
+      <Route path='/professordash' element ={<Professor_homepage/>}/>
       <Route path='/professorForm' element ={<ProfessorDetailForm/>}/>
       <Route path='/adminsignup' element={<AdminSignup/>}/>
       <Route path='/admindashboard' element={<AdminDashboard/>}/>
