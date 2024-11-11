@@ -16,106 +16,96 @@ import axios from 'axios';
 
 const generateTimeSlots = (start, end) => {
     const slots = [];
-
     const parseTime = (timeStr) => {
         const [time, modifier] = timeStr.split(" ");
         let [hours, minutes] = time.split(":").map(Number);
-
-        if (modifier === "PM" && hours !== 12) {
-            hours += 12;
-        } else if (modifier === "AM" && hours === 12) {
-            hours = 0;
-        }
-
+        if (modifier === "PM" && hours !== 12) hours += 12;
+        else if (modifier === "AM" && hours === 12) hours = 0;
         const date = new Date();
         date.setHours(hours, minutes, 0, 0);
         return date;
     };
-
-    const formatTime = (date) => {
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-    };
-
+    const formatTime = (date) => date.toTimeString().slice(0, 5);
     const currentTime = parseTime(start);
     const endTime = parseTime(end);
-
     while (currentTime < endTime) {
         const slotStart = formatTime(currentTime);
         currentTime.setMinutes(currentTime.getMinutes() + 15);
         const slotEnd = formatTime(currentTime);
         slots.push(`${slotStart} - ${slotEnd}`);
     }
-
     return slots;
 };
 
+// Helper function to convert "AM/PM" time to 24-hour format
+function convertTo24HourString(time) {
+    const [timePart, modifier] = time.split(" ");
+    let [hours, minutes] = timePart.split(":").map(Number);
+    if (modifier === "PM" && hours !== 12) hours += 12;
+    else if (modifier === "AM" && hours === 12) hours = 0;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
 
 export default function ProfessorDetail({ data }) {
     const navigate = useNavigate();
     const [openDialog, setOpenDialog] = useState(false);
+    const [loginPrompt, setLoginPrompt] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [confirmationMessage, setConfirmationMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
     const officeHours = data.office_hours || [];
 
+    const handleScheduleButtonClick = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setLoginPrompt(true); // Show login prompt if no token
+        } else {
+            setOpenDialog(true); // Open the appointment dialog if user is logged in
+        }
+    };
+
     const handleSlotClick = (slot) => {
         setSelectedSlot(slot);
         setConfirmationMessage("");
     };
 
+
+const islogin = () => {
+
+    const token = localStorage.getItem('token');     
+
+    if ( !token ){
+        return false ; 
+    }
+    else {
+
+        return true ;   
+
+    }
+}
+
     const handleConfirmAppointment = async () => {
         if (selectedSlot) {
             setLoading(true);
             const [startTime, endTime] = selectedSlot.split(" - ");
-            const day = officeHours.find((hours) =>
+            const startTime24 = convertTo24HourString(startTime);
+            const endTime24 = convertTo24HourString(endTime);
+            const officeHoursEntry = officeHours.find((hours) =>
                 generateTimeSlots(hours.startTime, hours.endTime).includes(selectedSlot)
-            ).day;
-    
+            );
+            if (!officeHoursEntry) {
+                setConfirmationMessage("Office hours entry not found for the selected day.");
+                setLoading(false);
+                return;
+            }
+            const day = officeHoursEntry.day;
             try {
                 const professorId = data._id;
                 const professorName = data.name;
                 const professorEmail = data.email;
-    
-                // Replace with actual student's email and name from your authentication or context
-                const studentEmail = "your-student-email@example.com";
-                const studentName = "Your Student Name";
-    
-                // Helper function to convert "AM/PM" time to a comparable Date object
-                const convertToComparableTime = (timeStr) => {
-                    const [time, modifier] = timeStr.split(" ");
-                    let [hours, minutes] = time.split(":").map(Number);
-    
-                    if (modifier === "PM" && hours !== 12) {
-                        hours += 12;
-                    } else if (modifier === "AM" && hours === 12) {
-                        hours = 0;
-                    }
-    
-                    const date = new Date();
-                    date.setHours(hours, minutes, 0, 0);
-                    return date;
-                };
-    
-                // Convert the start and end times from the office hours to comparable Date objects
-                const officeHoursStart = convertToComparableTime(
-                    officeHours.find((hours) => hours.day === day).startTime
-                );
-                const officeHoursEnd = convertToComparableTime(
-                    officeHours.find((hours) => hours.day === day).endTime
-                );
-    
-                // Convert the selected appointment times to comparable Date objects
-                const appointmentStart = convertToComparableTime(startTime);
-                const appointmentEnd = convertToComparableTime(endTime);
-    
-                // Check if the appointment times are within the office hours
-                if (appointmentStart < officeHoursStart || appointmentEnd > officeHoursEnd) {
-                    setConfirmationMessage("Requested time is outside of the professor's office hours.");
-                    setLoading(false);
-                    return;
-                }
-    
+                const studentEmail = "your-student-email@example.com"; // Replace with actual student email
+                const studentName = "Your Student Name"; // Replace with actual student name
                 const response = await axios.post(
                     `http://localhost:3087/bookappoinment/${professorId}`,
                     {
@@ -124,8 +114,8 @@ export default function ProfessorDetail({ data }) {
                         professor: professorName,
                         professor_email: professorEmail,
                         day,
-                        startTime,
-                        endTime,
+                        startTime: startTime24,
+                        endTime: endTime24,
                     },
                     {
                         headers: {
@@ -133,9 +123,9 @@ export default function ProfessorDetail({ data }) {
                         },
                     }
                 );
-    
                 setConfirmationMessage(response.data.message || "Appointment booked successfully");
             } catch (error) {
+                console.error("Error response from backend:", error.response);
                 setConfirmationMessage(error.response?.data?.error || "Failed to book appointment");
             } finally {
                 setLoading(false);
@@ -143,7 +133,6 @@ export default function ProfessorDetail({ data }) {
             }
         }
     };
-    
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 flex items-center justify-center py-12 px-4">
@@ -224,12 +213,13 @@ export default function ProfessorDetail({ data }) {
 
                 <Button
                     className="fixed bottom-6 right-6 bg-green-600 text-white hover:bg-green-500 px-4 py-2 rounded-full flex items-center"
-                    onClick={() => setOpenDialog(true)}
+                    onClick={ !islogin? () => setOpenDialog(true) : () => navigate('/usersignup') }
                 >
                     <AiOutlineSchedule className="mr-2" />
                     Schedule Appointment
                 </Button>
 
+                {/* Appointment Dialog */}
                 <Dialog open={openDialog} onOpenChange={setOpenDialog}>
                     <DialogContent className="bg-gray-800 text-white rounded-lg p-6 space-y-4 shadow-xl">
                         <DialogTitle className="text-2xl font-bold flex justify-between items-center">
@@ -278,7 +268,36 @@ export default function ProfessorDetail({ data }) {
                         )}
                     </DialogContent>
                 </Dialog>
+
+                {/* Login Prompt Dialog */}
+                <Dialog open={loginPrompt} onOpenChange={setLoginPrompt}>
+                    <DialogContent className="bg-gray-800 text-white rounded-lg p-6 space-y-4 shadow-xl">
+                        <DialogTitle className="text-2xl font-bold">
+                            Please Log In or Sign Up
+                        </DialogTitle>
+                        <p className="text-gray-400">
+                            To book an appointment, you need to be logged in. Please log in or sign up to continue.
+                        </p>
+                        <div className="flex justify-end space-x-4">
+                            <Button
+                                className="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-md"
+                                onClick={() => navigate('/userlogin')}
+                            >
+                                Log In
+                            </Button>
+                            <Button
+                                className="bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-md"
+                                onClick={() => navigate('/usersignup')}
+                            >
+                                Sign Up
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     );
 }
+
+
+
