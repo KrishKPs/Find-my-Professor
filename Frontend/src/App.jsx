@@ -12,6 +12,7 @@ import UserSignup from './Pages/SignupUser'
 import ProfessorDetail from './Pages/ProfessorDetail'
 import ProfessorDetailForm from './Pages/ProfessorDetailForm'
 import ProfessorDashboard from './Pages/Professor_homepage'
+import LoadingPage from './Pages/Loading'
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
     
      <BrowserRouter>
      <Routes>
+      <Route path='/' element={<LoadingPage/>}/>
       <Route path='/login' element={<LoginUI/>}/>
       <Route path='/signup' element={<ProfessorSignup/>}/>
       <Route path='/dashboard' element ={<AcademicFinder/>}/>
