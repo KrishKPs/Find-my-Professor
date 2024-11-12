@@ -21,6 +21,8 @@ const approveappoinment = require('../Functions/appoinmentapprove');
 const approvetheappoinment = require('../Functions/approvetheappoinment');
 const seeapprovemeeting = require('../Functions/seeapprovemeeting');
 const declinemeetings = require('../Functions/declinemeetings');
+const seecompletedappoinments = require('../Functions/seecompletedappoinments');
+const completeappoinments = require('../Functions/completeappoinments');
 
 const router = express.Router(); 
 
@@ -54,6 +56,10 @@ router.post ('/approveappoinment' , authenticate , approvetheappoinment);
 router.get('/seeapprovemettings' , authenticate , seeapprovemeeting); 
 
 router.post('/declineappoinment' , authenticate , declinemeetings); 
+
+router.get ('/seecompletedmeeting' , authenticate , seecompletedappoinments); 
+router.post('/completemeetings' , authenticate, completeappoinments); 
+
 
 
 

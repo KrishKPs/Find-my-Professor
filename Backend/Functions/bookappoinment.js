@@ -73,7 +73,7 @@ async function bookAppointment(req, res) {
       professor: findProfessor.name,
       day: body.day,
       startTime: body.startTime,
-      status: "Pending",
+      status: "Pending" || "Approved",  
     });
 
     if (appointmentExists) {

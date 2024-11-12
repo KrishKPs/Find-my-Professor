@@ -34,4 +34,4 @@ async function declinemeetings (req,res) {
 
 }
 
-module.exports = declinemeetings;  // Export the function for use in other files.  // Compare this snippet from Backend/Functions/declinemeetings.js: 
+module.exports = declinemeetings;  // Export the function for use in other files.  // Compare this snippet from Backend/Functions/declinemeetings.js:
