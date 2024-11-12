@@ -15,14 +15,14 @@ const LoadingPage = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
       <div className="relative flex items-center justify-center">
         {/* Outer Ring */}
-        <div className="w-24 h-24 border-4 border-t-transparent border-green-500 rounded-full animate-spin-slow"></div>
+        <div className="w-24 h-24 border-4 border-t-transparent border-white rounded-full animate-spin-slow"></div>
         {/* Inner Ring */}
-        <div className="absolute w-16 h-16 border-4 border-b-transparent border-green-400 rounded-full animate-spin-reverse"></div>
+        <div className="absolute w-16 h-16 border-4 border-b-transparent border-white rounded-full animate-spin-reverse"></div>
         {/* Dot */}
-        <div className="absolute w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
+        <div className="absolute w-4 h-4 bg-white rounded-full animate-pulse"></div>
       </div>
 
-      <p className="mt-6 text-2xl font-bold text-green-300 animate-fade-in">
+      <p className="mt-6 text-2xl font-bold text-white animate-fade-in">
         Loading... Please Wait
       </p>
 

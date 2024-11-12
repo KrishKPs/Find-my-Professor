@@ -12,6 +12,7 @@ const Trial = () => {
   const [pendingCount, setPendingCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isEditing, setIsEditing] = useState(false); // State for edit mode
+  const [ApprovedMeetings, setApprovedMeetings] = useState([]);
 
   useEffect(() => {
     const fetchProfessorData = async () => {
@@ -33,6 +34,20 @@ const Trial = () => {
       setPendingCount(appointmentsData.filter(appointment => appointment.status === 'Pending').length);
     };
 
+    const fetchApprovedMeetings = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await axios.get('http://localhost:3087/seeapprovemettings', {
+          headers: { Authorization: token },
+        });
+        setApprovedMeetings(response.data.approved_meetings || []); // Set approved meetings
+      } catch (error) {
+        console.error('Error fetching approved meetings:', error);
+      }
+    };
+
+
+    fetchApprovedMeetings();
     fetchProfessorData();
     fetchAppointments();
   }, []);
@@ -45,7 +60,7 @@ const Trial = () => {
         { student_email: studentEmail },
         { headers: { Authorization: token } }
       );
-
+  
       if (response.data.msg === 'Appointment Approved') {
         setAppointments((prevAppointments) =>
           prevAppointments.map((appointment) =>
@@ -55,9 +70,37 @@ const Trial = () => {
           )
         );
         setPendingCount((prev) => prev - 1); // Decrease the pending count after approval
+        
+        // Add the approved appointment to the ApprovedMeetings state
+        const approvedAppointment = appointments.find(appointment => appointment._id === appointmentId);
+        setApprovedMeetings((prevApproved) => [...prevApproved, approvedAppointment]);
       }
     } catch (error) {
       console.error('Error approving appointment:', error);
+    }
+  };
+
+  const handleDeclineAppointment = async (appointmentId, studentEmail) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.post(
+        'http://localhost:3087/declineappoinment',
+        { student_email: studentEmail },
+        { headers: { Authorization: token } }
+      );
+  
+      if (response.data.message === 'Meeting Declined') {
+        setAppointments((prevAppointments) =>
+          prevAppointments.map((appointment) =>
+            appointment._id === appointmentId
+              ? { ...appointment, status: 'Declined' }
+              : appointment
+          )
+        );
+        setPendingCount((prev) => prev - 1); // Decrease the pending count after decline
+      }
+    } catch (error) {
+      console.error('Error declining appointment:', error);
     }
   };
 
@@ -195,9 +238,15 @@ const Trial = () => {
                   </div>
                   <Button
                     onClick={() => handleApproveAppointment(appointment._id, appointment.student_email)}
-                    className="bg-teal-600 text-xs text-white px-3 py-1 rounded-lg hover:bg-teal-700"
+                    className="bg-teal-600 text-xs text-white px-3 py-1 rounded-lg hover:bg-teal-700 mr-2"
                   >
                     Approve
+                  </Button>
+                  <Button
+                    onClick={() => handleDeclineAppointment(appointment._id, appointment.student_email)}
+                    className="bg-red-600 text-xs text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                  >
+                    Decline
                   </Button>
                 </div>
               ))
@@ -213,10 +262,10 @@ const Trial = () => {
         <h2 className="text-3xl font-bold text-white mb-6">Appointments</h2>
 
         {/* Approved Appointments */}
-        {approvedAppointments.length > 0 && (
+        {ApprovedMeetings.length > 0 && (
           <div>
-            <h3 className="text-2xl font-semibold text-green-300 mb-4">Approved Appointments</h3>
-            {approvedAppointments.map((appointment) => (
+            <h3 className="text-2xl font-semibold text-green-300 mb-4">Approved Meetings</h3>
+            {ApprovedMeetings.map((appointment) => (
               <Card key={appointment._id} className="mb-4 p-4 bg-white text-gray-900 rounded-xl shadow-md">
                 <div className="flex items-center">
                   <FaCheckCircle className="text-green-500 mr-2" />
