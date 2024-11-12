@@ -46,11 +46,30 @@ const Trial = () => {
       }
     };
 
-
     fetchApprovedMeetings();
     fetchProfessorData();
     fetchAppointments();
   }, []);
+
+  const handleCompleteAppointment = async (appointmentId, studentEmail) => {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await axios.post(
+            'http://localhost:3087/completemeetings',
+            { student_email: studentEmail },  // Send student email
+            { headers: { Authorization: token } }
+        );
+
+        if (response.data.message === 'Appointment marked as completed') {
+            // Remove the completed appointment from the list
+            setApprovedMeetings((prevMeetings) =>
+                prevMeetings.filter((appointment) => appointment._id !== appointmentId)
+            );
+        }
+    } catch (error) {
+        console.error('Error completing appointment:', error);
+    }
+};
 
   const handleApproveAppointment = async (appointmentId, studentEmail) => {
     const token = localStorage.getItem('token');
@@ -266,14 +285,20 @@ const Trial = () => {
           <div>
             <h3 className="text-2xl font-semibold text-green-300 mb-4">Approved Meetings</h3>
             {ApprovedMeetings.map((appointment) => (
-              <Card key={appointment._id} className="mb-4 p-4 bg-white text-gray-900 rounded-xl shadow-md">
-                <div className="flex items-center">
-                  <FaCheckCircle className="text-green-500 mr-2" />
-                  <p className="font-semibold text-gray-700">{appointment.day}: {appointment.startTime} - {appointment.endTime}</p>
-                </div>
-                <p className="text-gray-600">Student: {appointment.student_name}</p>
-              </Card>
-            ))}
+  <Card key={appointment._id} className="mb-4 p-4 bg-white text-gray-900 rounded-xl shadow-md">
+    <div className="flex items-center">
+      <FaCheckCircle className="text-green-500 mr-2" />
+      <p className="font-semibold text-gray-700">{appointment.day}: {appointment.startTime} - {appointment.endTime}</p>
+    </div>
+    <p className="text-gray-600">Student: {appointment.student_name}</p>
+    <Button
+      onClick={() => handleCompleteAppointment(appointment._id)} // Call the complete function
+      className="bg-blue-600 text-white mt-2"
+    >
+      Mark as Completed
+    </Button>
+  </Card>
+))}
           </div>
         )}
       </div>
