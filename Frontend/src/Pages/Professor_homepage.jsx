@@ -14,6 +14,11 @@ const Trial = () => {
   const [isEditing, setIsEditing] = useState(false); // State for edit mode
   const [ApprovedMeetings, setApprovedMeetings] = useState([]);
   const [isFading, setIsFading] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);  
+  
+  const change = () => {
+    setIsCompleted(!isCompleted); 
+  }
 
   useEffect(() => {
     const fetchProfessorData = async () => {
@@ -50,7 +55,7 @@ const Trial = () => {
     fetchApprovedMeetings();
     fetchProfessorData();
     fetchAppointments();
-  }, []);
+  }, [isCompleted]);
 
   const handleCompleteAppointment = async (appointmentId, student_email) => {
     const token = localStorage.getItem('token');
@@ -60,10 +65,13 @@ const Trial = () => {
         { student_email: student_email },
         { headers: { Authorization: token } }
       );
+
+      change () ; 
   
       if (response.data.message === 'Appointment marked as completed') {
         // Trigger fade animation
         setIsFading(true);
+
   
         // Delay the removal of the appointment to allow animation to finish
         setTimeout(() => {
@@ -302,7 +310,7 @@ const Trial = () => {
     <p className="text-gray-600">Student: {appointment.student_name}</p>
     <p className="text-gray-600">Email: {appointment.student_email}</p>
     <Button
-      onClick={() => handleCompleteAppointment(appointment._id,appointment.student_email)} // Call the complete function
+      onClick={() => handleCompleteAppointment(appointment._id,appointment.student_email) } // Call the complete function
       className="bg-blue-600 text-white mt-2"
     >
       Mark as Completed
