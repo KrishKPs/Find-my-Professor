@@ -199,6 +199,19 @@ const ProfessorDetailSchema = mongoose.Schema({
     }
 });
 
+const imageSchema =  mongoose.Schema({
+    filename: {
+        type: String,
+        required: true, // File name saved on the server
+    },
+    path: {
+        type: String, // File path on the server
+        required: true,
+    }
+});
+
+const Image = mongoose.model('Image', imageSchema);
+
 
 const Professor = mongoose.model('Professor', ProfessorSchema);  
 const Admin = mongoose.model('Admin', adminSchema); 
@@ -212,5 +225,6 @@ module.exports = {
     Admin,
     ProfessorDetail  , 
     User , 
-    Appoinments
+    Appoinments, 
+    Image
 };   

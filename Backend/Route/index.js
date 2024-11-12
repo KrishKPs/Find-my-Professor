@@ -26,6 +26,35 @@ const completeappoinments = require('../Functions/completeappoinments');
 
 const router = express.Router(); 
 
+// Add multer configuration here to ensure it works with professorDetails
+const multer = require('multer');
+const path = require('path');
+const uploadImage = require('../Functions/uploadimage');
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Set destination folder
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname)); // Unique filename
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true); // Accept image files only
+        } else {
+            cb(new Error('Only image files are allowed'), false);
+        }
+    }
+});
+
+// Use multer middleware for /enterdetails route
+router.post('/enterdetails', authenticate, upload.single('profile_photo'), professorDetails);
+
+
 
 
 router.post('/adminsignup',  adminSignup); 
@@ -36,7 +65,7 @@ router.post('/updateverification' , authenticate , changeverification)
 router.post('/professorsignup', professorSignup); 
 router.post('/professorlogin' , professorlogin); 
 
-router.post('/enterdetails' , authenticate , professorDetails)
+// router.post('/enterdetails' , authenticate , professorDetails)
 router.put('/updatedetails' , authenticate , detailsupdate )
 
 router.post('/usersignup' , usersignup)
@@ -59,6 +88,8 @@ router.post('/declineappoinment' , authenticate , declinemeetings);
 
 router.get ('/seecompletedmeeting' , authenticate , seecompletedappoinments); 
 router.post('/completemeetings' , authenticate, completeappoinments); 
+
+router.post('/upload', uploadImage);
 
 
 
