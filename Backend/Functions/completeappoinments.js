@@ -20,10 +20,12 @@ async function completeappoinments ( req, res) {
         });
     }   
 
-    await Appoinments.updateOne ( { professor_email : professor , status : "Approved" , student_email : body.student_email } , { $set : { status : "Completed" } } );  
+   const hello =  await Appoinments.updateOne ( { professor_email : professor , status : "Approved" , student_email : body.student_email } , { $set : { status : "Completed" } } );  
     
     
     res.json ({
+
+        complete : hello , 
         msg : "Appoinment Completed" ,    
     })   
 }
