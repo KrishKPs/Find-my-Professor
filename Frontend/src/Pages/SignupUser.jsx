@@ -58,8 +58,19 @@ export default function UserSignup() {
         const response = await axios.post('http://localhost:3087/usersignup', formData);
         console.log(response.data);
         alert('Registration successful');
+        
+        // Store token in localStorage
         localStorage.setItem('token', response.data.token);
-        navigate('/homepage');
+  
+        // Check for last visited URL in localStorage
+        const lastVisitedURL = localStorage.getItem('lastVisitedURL');
+        if (lastVisitedURL) {
+          navigate(lastVisitedURL); // Redirect to the last visited page
+          localStorage.removeItem('lastVisitedURL'); // Clear the stored URL after navigation
+        } else {
+          navigate('/homepage'); // Default redirect if no last visited URL
+        }
+  
       } catch (error) {
         alert(error);
       }
@@ -67,7 +78,7 @@ export default function UserSignup() {
       console.log('Form has errors, please correct them');
     }
   };
-
+  
   const isFormValid = () => {
     return Object.values(formData).every((value) => value !== '') && Object.values(errors).every((error) => error === '');
   };

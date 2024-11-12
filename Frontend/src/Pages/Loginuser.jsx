@@ -45,7 +45,16 @@ export default function LoginUser() {
       console.log(response.data.token);
       localStorage.setItem('token', response.data.token);
       alert('Login successful');
-      navigate('/homepage');
+      
+      // Redirect to the last visited URL or homepage
+      const lastVisitedURL = localStorage.getItem('lastVisitedURL');
+      if (lastVisitedURL) {
+        navigate(lastVisitedURL); // Redirect to the last visited page
+        localStorage.removeItem('lastVisitedURL'); // Clear the stored URL after navigation
+      } else {
+        navigate('/homepage');
+      }
+  
       console.log('Form submitted:', formData);
     } catch (error) {
       if (error.response) {
@@ -54,6 +63,7 @@ export default function LoginUser() {
       }
     }
   };
+  
 
   const isFormValid = () => {
     return Object.values(formData).every(value => value !== '') && Object.values(errors).every(error => error === '');

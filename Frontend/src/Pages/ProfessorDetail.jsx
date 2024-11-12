@@ -59,11 +59,13 @@ export default function ProfessorDetail({ data }) {
     const handleScheduleButtonClick = () => {
         const token = localStorage.getItem('token');
         if (!token) {
+            localStorage.setItem('lastVisitedURL', window.location.pathname); // Store the current page URL
             setLoginPrompt(true); // Show login prompt if no token
         } else {
             setOpenDialog(true); // Open the appointment dialog if user is logged in
         }
     };
+    
 
     const handleSlotClick = (slot) => {
         setSelectedSlot(slot);
