@@ -13,6 +13,7 @@ const Trial = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isEditing, setIsEditing] = useState(false); // State for edit mode
   const [ApprovedMeetings, setApprovedMeetings] = useState([]);
+  const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
     const fetchProfessorData = async () => {
@@ -51,25 +52,32 @@ const Trial = () => {
     fetchAppointments();
   }, []);
 
-  const handleCompleteAppointment = async (appointmentId, studentEmail) => {
+  const handleCompleteAppointment = async (appointmentId, student_email) => {
     const token = localStorage.getItem('token');
     try {
-        const response = await axios.post(
-            'http://localhost:3087/completemeetings',
-            { student_email: studentEmail },  // Send student email
-            { headers: { Authorization: token } }
-        );
-
-        if (response.data.message === 'Appointment marked as completed') {
-            // Remove the completed appointment from the list
-            setApprovedMeetings((prevMeetings) =>
-                prevMeetings.filter((appointment) => appointment._id !== appointmentId)
-            );
-        }
+      const response = await axios.post(
+        'http://localhost:3087/completemeetings',
+        { student_email: student_email },
+        { headers: { Authorization: token } }
+      );
+  
+      if (response.data.message === 'Appointment marked as completed') {
+        // Trigger fade animation
+        setIsFading(true);
+  
+        // Delay the removal of the appointment to allow animation to finish
+        setTimeout(() => {
+          setApprovedMeetings((prevMeetings) =>
+            prevMeetings.filter((appointment) => appointment._id !== appointmentId)
+          );
+          setIsFading(false); // Reset fading state after animation
+        }, 300); // Adjust the timeout duration to match your animation duration
+      }
     } catch (error) {
-        console.error('Error completing appointment:', error);
+      console.error('Error completing appointment:', error);
     }
-};
+  };
+  
 
   const handleApproveAppointment = async (appointmentId, studentEmail) => {
     const token = localStorage.getItem('token');
@@ -253,6 +261,7 @@ const Trial = () => {
                 >
                   <div>
                     <p className="text-sm font-semibold">{appointment.student_name}</p>
+                    <p className="text-xs">{appointment.student_email}</p>
                     <p className="text-xs">{appointment.day}: {appointment.startTime} - {appointment.endTime}</p>
                   </div>
                   <Button
@@ -291,8 +300,9 @@ const Trial = () => {
       <p className="font-semibold text-gray-700">{appointment.day}: {appointment.startTime} - {appointment.endTime}</p>
     </div>
     <p className="text-gray-600">Student: {appointment.student_name}</p>
+    <p className="text-gray-600">Email: {appointment.student_email}</p>
     <Button
-      onClick={() => handleCompleteAppointment(appointment._id)} // Call the complete function
+      onClick={() => handleCompleteAppointment(appointment._id,appointment.student_email)} // Call the complete function
       className="bg-blue-600 text-white mt-2"
     >
       Mark as Completed
