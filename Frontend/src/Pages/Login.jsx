@@ -61,7 +61,7 @@ export default function LoginUI() {
 
         localStorage.setItem('token', response.data.token)   
         alert ('Login successful')  
-        navigate ('/professor')
+        navigate ('/professordash')
         console.log('Form submitted:', formData) 
         
       } catch (error) {

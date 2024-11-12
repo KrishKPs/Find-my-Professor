@@ -68,7 +68,7 @@ export default function ProfessorSignup() {
         localStorage.setItem('token', response.data.token)
 
         // Navigate to professor detail form
-        navigate('/professorForm')
+        navigate('/professorform')
       } catch (error) {
         console.error(error)
         alert('Error during registration')

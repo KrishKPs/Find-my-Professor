@@ -26,12 +26,12 @@ function App() {
       <Route path='/' element={<LoadingPage/>}/>
       <Route path='/login' element={<LoginUI/>}/>
       <Route path='/signup' element={<ProfessorSignup/>}/>
-      <Route path='/dashboard' element ={<AcademicFinder/>}/>
+      {/* <Route path='/dashboard' element ={<AcademicFinder/>}/> */}
       <Route path='/homepage' element ={<Homepage/>}/>
       <Route path='/homepage/:id' element ={<OneProfessor/>}/>  
-      <Route path='/professor' element ={<ProfessorDetail/>}/>
+      {/* <Route path='/professordetail' element ={<ProfessorDetail/>}/> */}
       <Route path='/professordash' element ={<ProfessorDashboard/>}/>
-      <Route path='/professorForm' element ={<ProfessorDetailForm/>}/>
+      <Route path='/professorform' element ={<ProfessorDetailForm/>}/>
       <Route path='/adminsignup' element={<AdminSignup/>}/>
       <Route path='/admindashboard' element={<AdminDashboard/>}/>
       <Route path='/userSignup' element={<UserSignup/>}/>
