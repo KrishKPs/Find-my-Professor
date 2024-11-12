@@ -71,19 +71,19 @@ export default function ProfessorDetail({ data }) {
     };
 
 
-const islogin = () => {
+    const islogin = () => {
 
-    const token = localStorage.getItem('token');     
+        const token = localStorage.getItem('token');
 
-    if ( !token ){
-        return false ; 
+        if (!token) {
+            return false;
+        }
+        else {
+
+            return true;
+
+        }
     }
-    else {
-
-        return true ;   
-
-    }
-}
 
     const handleConfirmAppointment = async () => {
         if (selectedSlot) {
@@ -148,9 +148,8 @@ const islogin = () => {
                 <Card className="relative bg-gray-800 text-gray-200 rounded-lg shadow-lg p-6 md:p-8">
                     <div className="absolute top-6 right-6">
                         <div
-                            className={`flex items-center space-x-1 text-sm font-semibold ${
-                                data.available === 'Available' ? 'text-green-500' : 'text-red-500'
-                            }`}
+                            className={`flex items-center space-x-1 text-sm font-semibold ${data.available === 'Available' ? 'text-green-500' : 'text-red-500'
+                                }`}
                         >
                             <AiOutlineCheckCircle className="text-lg" />
                             <span>{data.available}</span>
@@ -213,11 +212,12 @@ const islogin = () => {
 
                 <Button
                     className="fixed bottom-6 right-6 bg-green-600 text-white hover:bg-green-500 px-4 py-2 rounded-full flex items-center"
-                    onClick={ !islogin? () => setOpenDialog(true) : () => navigate('/usersignup') }
+                    onClick={handleScheduleButtonClick}
                 >
                     <AiOutlineSchedule className="mr-2" />
                     Schedule Appointment
                 </Button>
+
 
                 {/* Appointment Dialog */}
                 <Dialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -237,11 +237,10 @@ const islogin = () => {
                                         {generateTimeSlots(hours.startTime, hours.endTime).map((slot, slotIndex) => (
                                             <Button
                                                 key={slotIndex}
-                                                className={`px-3 py-2 rounded-md text-sm ${
-                                                    selectedSlot === slot
+                                                className={`px-3 py-2 rounded-md text-sm ${selectedSlot === slot
                                                         ? 'bg-blue-600 text-white'
                                                         : 'bg-gray-700 text-white hover:bg-gray-600'
-                                                }`}
+                                                    }`}
                                                 onClick={() => handleSlotClick(slot)}
                                             >
                                                 {slot}
