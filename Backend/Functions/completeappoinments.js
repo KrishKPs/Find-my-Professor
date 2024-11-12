@@ -20,7 +20,12 @@ async function completeappoinments ( req, res) {
         });
     }   
 
-    await Appoinments.update ( { professor_email : professor , status : "Approved" , student_email : body.student_email } , { $set : { status : "Completed" } } );       
+    await Appoinments.updateOne ( { professor_email : professor , status : "Approved" , student_email : body.student_email } , { $set : { status : "Completed" } } );  
+    
+    
+    res.json ({
+        msg : "Appoinment Completed" ,    
+    })   
 }
 
 module.exports = completeappoinments;  // Export the function for use in other files.  // Compare this snippet from Backend/Functions/getprofessor.js:
