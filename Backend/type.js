@@ -11,8 +11,8 @@ const adminSchema = zod.object({
 const UserSchema = zod.object({
     name : zod.string().min(1, 'Name is required'),  
     email : zod.string().email('Invalid email format'), 
-    college_name : zod.string().min(1, 'College name is required'), 
     student_id : zod.string().min(1, 'Student ID is required'),  
+    college_name : zod.string().min(1, 'College name is required'), 
     password : zod.string().min(6, 'Password must be at least 6 characters long'),           
 })
 

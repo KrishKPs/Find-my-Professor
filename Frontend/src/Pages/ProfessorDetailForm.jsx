@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'react-toastify';
 import { BiCalendar } from 'react-icons/bi';  // Icon for calendar
 import axios from 'axios';  // Import axios
+import { useNavigate } from 'react-router-dom';
 
 const ProfessorDetailForm = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const ProfessorDetailForm = () => {
     location: '',
     office_hours: [],  // office_hours updated with startTime, endTime
   });
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -66,6 +68,7 @@ const ProfessorDetailForm = () => {
 
       if (response.status === 200) {
         toast.success('Professor details created successfully!');
+        navigate('/professordash'); // Redirect to home page
       } else {
         toast.error('Error creating professor details.');
       }
