@@ -48,7 +48,7 @@ export default function Homepage() {
                 <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
                     <div className="text-2xl font-semibold">Find My Professor</div>
                     <div className="hidden md:flex space-x-6">
-                        <a href="#home" className="hover:text-gray-100">Home</a>
+                
                         <span
                             onClick={() => navigate('/usersignup')}
                             className="hover:text-gray-100 cursor-pointer"
