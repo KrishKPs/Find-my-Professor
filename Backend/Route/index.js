@@ -19,6 +19,7 @@ const bookappoinment = require('../Functions/bookappoinment');
 const getprofessor = require('../Functions/getprofessor');
 const approveappoinment = require('../Functions/appoinmentapprove');
 const approvetheappoinment = require('../Functions/approvetheappoinment');
+const seeapprovemeeting = require('../Functions/seeapprovemeeting');
 
 const router = express.Router(); 
 
@@ -48,6 +49,8 @@ router.get ('/getprofessor' , authenticate , getprofessor)
 
 router.get ('/seeappoinments' , authenticate , approveappoinment); 
 router.post ('/approveappoinment' , authenticate , approvetheappoinment); 
+
+router.get('/seeapprovemettings' , authenticate , seeapprovemeeting); 
 
 
 
