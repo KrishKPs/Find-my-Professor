@@ -120,7 +120,7 @@ function ImageUpload() {
                     <p className="text-center text-lg text-gray-700 mt-4">{message}</p>
                 )}
             </div>
-            <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+            <ToastContainer position="top-right" autoClose={3000} hideProgressBar/>
         </div>
     );
 }
