@@ -146,19 +146,36 @@ const Trial = () => {
   const handleSaveChanges = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.post(
+      // Send the updated professor data, including office hours, to the backend
+      const response = await axios.put(
         'http://localhost:3087/updatedetails',
-        { ...professor },
+        { ...professor }, // Send the updated professor object
         { headers: { Authorization: token } }
       );
-
+  
+      // Check if the response contains the updated professor data
       if (response.data.msg === 'Professor updated') {
-        setIsEditing(false); // Exit edit mode
+        // Update the professor state immediately with the new data from the backend response
+        setProfessor(response.data.professor); // Ensure the state is updated with the latest data
+  
+        // Force a re-render by setting the professor state
+        setIsEditing(false); // Exit the edit mode
+  
+        // Optionally, you can show a success message to the user
+        alert("Professor details updated successfully!");
+      } else {
+        console.error("Error: Unable to save changes.");
       }
     } catch (error) {
       console.error('Error saving professor data:', error);
     }
   };
+  
+  
+  
+  
+  
+  
 
   if (loading) return <Skeleton className="w-full h-64" />;
 
@@ -169,71 +186,128 @@ const Trial = () => {
   return (
     <div className="bg-gradient-to-r from-blue-800 to-teal-600 min-h-screen text-white p-8 flex flex-col items-center relative">
       {/* Professor Section */}
-      {professor && (
-        <Card className="w-full md:w-3/4 lg:w-1/2 p-8 bg-white text-gray-900 rounded-3xl shadow-lg transform transition-all hover:scale-105 duration-300 mb-12">
-          <div className="flex items-center mb-6 justify-between">
-            <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-3xl">
-              <FaUser />
-            </div>
-            <div className="flex-grow ml-6">
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={professor.name}
-                  onChange={(e) => setProfessor({ ...professor, name: e.target.value })}
-                  className="text-4xl font-bold text-gray-900 border-b-2 focus:outline-none"
-                />
-              ) : (
-                <h2 className="text-4xl font-bold">{professor.name}</h2>
-              )}
-              <p className="text-lg font-medium text-gray-600">{professor.category}</p>
-              <p className="text-sm text-gray-500">{professor.email}</p>
-              <p className="text-sm text-gray-500">{professor.college_name}</p>
-            </div>
-            <div>
-              {isEditing ? (
-                <Button onClick={handleSaveChanges} className="bg-teal-600 text-white">
-                  Save Changes
-                </Button>
-              ) : (
-                <Button onClick={toggleEditMode} className="bg-yellow-600 text-white">
-                  <FaEdit className="mr-2" /> Edit Info
-                </Button>
-              )}
-            </div>
-          </div>
-          <div className="mt-6">
-            <h3 className="text-xl font-semibold mb-2">Major</h3>
-            {isEditing ? (
-              <input
-                type="text"
-                value={professor.major}
-                onChange={(e) => setProfessor({ ...professor, major: e.target.value })}
-                className="text-gray-700"
-              />
+      // Professor Section
+{professor && (
+  <Card className="w-full md:w-3/4 lg:w-1/2 p-8 bg-white text-gray-900 rounded-3xl shadow-lg transform transition-all hover:scale-105 duration-300 mb-12">
+    <div className="flex items-center mb-6 justify-between">
+      <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-3xl">
+        <FaUser />
+      </div>
+      <div className="flex-grow ml-6">
+        {isEditing ? (
+          <input
+            type="text"
+            value={professor.name}
+            onChange={(e) => setProfessor({ ...professor, name: e.target.value })}
+            className="text-4xl font-bold text-gray-900 border-b-2 focus:outline-none"
+          />
+        ) : (
+          <h2 className="text-4xl font-bold">{professor.name}</h2>
+        )}
+        <p className="text-lg font-medium text-gray-600">{professor.category}</p>
+        <p className="text-sm text-gray-500">{professor.email}</p>
+        <p className="text-sm text-gray-500">{professor.college_name}</p>
+      </div>
+      <div className="flex flex-col items-center justify-center">
+        {isEditing ? (
+          <Button
+            onClick={handleSaveChanges}
+            disabled={loading}  // Disable the button when loading
+            className="bg-teal-600 text-white w-full sm:w-auto mt-4 sm:mt-0 text-lg py-2 rounded-lg shadow-md transition duration-300 hover:bg-teal-700 focus:outline-none"
+          >
+            {loading ? (
+              <div className="spinner-border spinner-border-sm text-white" role="status"></div> // Display spinner when loading
             ) : (
-              <p className="text-gray-700">{professor.major}</p>
+              "Save Changes"
             )}
-            <h3 className="text-xl font-semibold mb-2 mt-4">Location</h3>
-            {isEditing ? (
-              <input
-                type="text"
-                value={professor.location}
-                onChange={(e) => setProfessor({ ...professor, location: e.target.value })}
-                className="text-gray-700"
-              />
-            ) : (
-              <p className="text-gray-700">{professor.location}</p>
-            )}
-            <h3 className="text-xl font-semibold mb-2 mt-4">Office Hours</h3>
-            <ul className="space-y-2">
-              {professor.office_hours?.map((hour) => (
-                <li key={hour._id} className="text-gray-700">{hour.day}: {hour.startTime} - {hour.endTime}</li>
-              ))}
-            </ul>
-          </div>
-        </Card>
+          </Button>
+        ) : (
+          <Button
+            onClick={toggleEditMode}
+            className="bg-yellow-600 text-white w-full sm:w-auto mt-4 sm:mt-0 text-lg py-2 rounded-lg shadow-md transition duration-300 hover:bg-yellow-700 focus:outline-none"
+          >
+            <FaEdit className="mr-2" />
+            Edit Info
+          </Button>
+        )}
+      </div>
+    </div>
+    <div className="mt-6">
+      <h3 className="text-xl font-semibold mb-2">Major</h3>
+      {isEditing ? (
+        <input
+          type="text"
+          value={professor.major}
+          onChange={(e) => setProfessor({ ...professor, major: e.target.value })}
+          className="text-gray-700 w-full border-b-2 focus:outline-none"
+        />
+      ) : (
+        <p className="text-gray-700">{professor.major}</p>
       )}
+      <h3 className="text-xl font-semibold mb-2 mt-4">Location</h3>
+      {isEditing ? (
+        <input
+          type="text"
+          value={professor.location}
+          onChange={(e) => setProfessor({ ...professor, location: e.target.value })}
+          className="text-gray-700 w-full border-b-2 focus:outline-none"
+        />
+      ) : (
+        <p className="text-gray-700">{professor.location}</p>
+      )}
+      <h3 className="text-xl font-semibold mb-2 mt-4">Office Hours</h3>
+      {isEditing ? (
+        professor.office_hours?.map((hour, index) => (
+          <div key={hour._id || index} className="flex space-x-2 mb-2">
+            <input
+              type="text"
+              value={hour.day}
+              onChange={(e) => {
+                const updatedHours = [...professor.office_hours];
+                updatedHours[index] = { ...hour, day: e.target.value };
+                setProfessor({ ...professor, office_hours: updatedHours });
+              }}
+              className="text-gray-700 w-1/3 border-b-2 focus:outline-none"
+            />
+            <input
+              type="text"
+              value={hour.startTime}
+              onChange={(e) => {
+                const updatedHours = [...professor.office_hours];
+                updatedHours[index] = { ...hour, startTime: e.target.value };
+                setProfessor({ ...professor, office_hours: updatedHours });
+              }}
+              placeholder="HH:MM (24hr)"
+              className="text-gray-700 w-1/3 border-b-2 focus:outline-none"
+            />
+            <input
+              type="text"
+              value={hour.endTime}
+              onChange={(e) => {
+                const updatedHours = [...professor.office_hours];
+                updatedHours[index] = { ...hour, endTime: e.target.value };
+                setProfessor({ ...professor, office_hours: updatedHours });
+              }}
+              placeholder="HH:MM (24hr)"
+              className="text-gray-700 w-1/3 border-b-2 focus:outline-none"
+            />
+          </div>
+        ))
+      ) : (
+        <ul className="space-y-2">
+          {professor.office_hours?.map((hour) => (
+            <li key={hour._id} className="text-gray-700">
+              {hour.day}: {hour.startTime} - {hour.endTime}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </Card>
+)}
+
+
+
 
       {/* Floating Notification Bell */}
       <div
