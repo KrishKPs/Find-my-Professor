@@ -1,6 +1,6 @@
 const multer = require('multer');
 const path = require('path');
-const {Image} = require('../db'); // Import the Image model
+const {Image, ProfessorDetail} = require('../db'); // Import the Image model
 
 // Multer configuration
 const storage = multer.diskStorage({
@@ -25,6 +25,26 @@ const upload = multer({
 
 // Function to handle image upload
 async function uploadImage(req, res) {
+
+    const professor = req.user ;
+
+    console.log (professor); 
+
+    if (!professor) {
+        return res.status(401).json({
+            message: 'No Professor found #1 '
+        });
+    } 
+
+    const professorfind = await ProfessorDetail.findOne( { email : professor } ); 
+
+    if (!professorfind) {
+        return res.status(401).json({
+            message: 'No Professor found #2'
+        });
+    } 
+
+
     upload(req, res, async (err) => {
         if (err) {
             return res.status(400).json({ message: err.message });
@@ -42,6 +62,9 @@ async function uploadImage(req, res) {
             });
 
             await newImage.save();
+            const imageUrl = `http://localhost:3087/uploads/${req.file.filename}`; // Replace localhost and port with your server details
+            await ProfessorDetail.updateOne({ email: professor }, { profile_photo: imageUrl });
+            
 
             res.status(200).json({
                 message: 'Image uploaded successfully',
@@ -53,6 +76,10 @@ async function uploadImage(req, res) {
                 error: error.message,
             });
         }
+
+           
+
+
     });
 }
 

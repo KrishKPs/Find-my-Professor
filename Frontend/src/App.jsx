@@ -14,6 +14,7 @@ import ProfessorDetailForm from './Pages/ProfessorDetailForm'
 import ProfessorDashboard from './Pages/Professor_homepage'
 import LoadingPage from './Pages/Loading'
 import AdminLogin from './Pages/Adminlogin'
+import ImageUpload from './Pages/Uploadimage'
 
 
 function App() {
@@ -38,6 +39,8 @@ function App() {
       <Route path='/adminlogin' element={<AdminLogin/>}/>
       <Route path='/userSignup' element={<UserSignup/>}/>
       <Route path='/userlogin' element={<LoginUser/>}/> 
+
+      <Route path='/imageupload' element={<ImageUpload/>}/>
 
       
 

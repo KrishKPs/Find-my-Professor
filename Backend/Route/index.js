@@ -89,7 +89,7 @@ router.post('/declineappoinment' , authenticate , declinemeetings);
 router.get ('/seecompletedmeeting' , authenticate , seecompletedappoinments); 
 router.post('/completemeetings' , authenticate, completeappoinments); 
 
-router.post('/upload', uploadImage);
+router.post('/upload',authenticate,  uploadImage);
 
 
 
