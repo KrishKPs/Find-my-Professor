@@ -68,7 +68,7 @@ const ProfessorDetailForm = () => {
 
       if (response.status === 200) {
         toast.success('Professor details created successfully!');
-        navigate('/professordash'); // Redirect to home page
+        navigate('/imageupload'); // Redirect to home page
       } else {
         toast.error('Error creating professor details.');
       }

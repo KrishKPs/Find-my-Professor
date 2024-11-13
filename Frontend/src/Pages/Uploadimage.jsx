@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function ImageUpload() {
     const [file, setFile] = useState(null);
     const [message, setMessage] = useState('');
     const [preview, setPreview] = useState('');
+
+    const navigate = useNavigate();
 
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
@@ -33,10 +36,12 @@ function ImageUpload() {
             const response = await axios.post('http://localhost:3087/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization : localStorage.getItem('token') 
                 },
             });
 
             setMessage(response.data.message);
+            navigate ('/professordash')
         } catch (error) {
             setMessage(error.response ? error.response.data.message : 'An error occurred');
         }
